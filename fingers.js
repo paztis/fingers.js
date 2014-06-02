@@ -1,3 +1,8 @@
+/*! Fingers.js - v0.0.1 - 2014-06-03
+ *
+ * Copyright (c) 2014 Jérôme HENAFF <jerome.henaff@gmail.com>;
+ * Licensed under the MIT license */
+
 (function(window, undefined) {
     'use strict';
 
@@ -626,7 +631,6 @@ var Transform = (function (_super) {
         this.data = {
             totalRotation: 0,
             deltaRotation: 0,
-
             totalScale: 1,
             deltaScale: 1
         }

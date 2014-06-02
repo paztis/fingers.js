@@ -3,11 +3,21 @@ module.exports = function(grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        meta: {
+            banner:
+                '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %>\n' +
+                ' *\n' +
+                ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %> <<%= pkg.author.email %>>;\n' +
+                ' * Licensed under the <%= _.pluck(pkg.licenses, "type").join(", ") %> license */\n\n'
+        },
         concat: {
             options: {
                 separator: '\n\n'
             },
             build: {
+                options: {
+                    banner: '<%= meta.banner %>'
+                },
                 src: [
                     'src/fingers.prefix',
                     'src/module.js',
@@ -24,12 +34,25 @@ module.exports = function(grunt) {
                     'src/fingers.suffix'],
                 dest: 'fingers.js'
             }
+        },
+        uglify: {
+            options: {
+                report: 'gzip',
+                sourceMap: 'fingers.min.map',
+                banner: '<%= meta.banner %>'
+            },
+            build: {
+                files: {
+                    'fingers.min.js': ['fingers.js']
+                }
+            }
         }
     });
 
     // Load the plugin that provides the "uglify" task.
     grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
 
     // Default task(s).
-    grunt.registerTask('default', ['concat']);
+    grunt.registerTask('default', ['concat', 'uglify']);
 };
