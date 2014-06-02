@@ -17,7 +17,6 @@ var Transform = (function (_super) {
         this.data = {
             totalRotation: 0,
             deltaRotation: 0,
-
             totalScale: 1,
             deltaScale: 1
         }
