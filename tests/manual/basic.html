@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+
+    <META http-equiv="Cache-Control" content="no-cache">
+    <META http-equiv="Pragma" content="no-cache">
+    <META http-equiv="Expires" content="0">
+
+    <title>Basic Tests</title>
+    <script src="../../fingers.js"></script>
+    <style>
+        #testDiv1 {
+            position: absolute;
+            top: 50px; left: 50px;
+            width: 200px; height: 200px;
+            background-color: black;
+            color: white;
+        }
+
+        #testDiv2 {
+            position: absolute;
+            top: 50px; left: 250px;
+            width: 200px; height: 200px;
+            background-color: red;
+            color: black;
+        }
+
+        #testDiv3 {
+            position: absolute;
+            top: 250px; left: 50px;
+            width: 200px; height: 200px;
+            background-color: green;
+            color: black;
+        }
+
+        #testDiv4 {
+            position: absolute;
+            top: 250px; left: 250px;
+            width: 200px; height: 200px;
+            background-color: blue;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="testDiv1"></div>
+    <div id="testDiv2"></div>
+    <div id="testDiv3"></div>
+    <div id="testDiv4"></div>
+    <script>
+
+        var div1E = document.getElementById("testDiv1");
+        var div2E = document.getElementById("testDiv2");
+        var div3E = document.getElementById("testDiv3");
+        var div4E = document.getElementById("testDiv4");
+
+        function init(pElement) {
+            pElement.tmpPosition = {
+                isUpdated: false,
+                x: 0,
+                y: 0,
+                rad: 0,
+                scale: 1,
+                rafId: 0
+            };
+        }
+
+        function listen(pElement) {
+
+            var finger = new Fingers(pElement);
+            finger.listenGesture(Fingers.gesture.Drag, null, function(pEventType, pFinger) {
+                if(pEventType === Fingers.Gesture.EVENT_TYPE.move) {
+                    pElement.tmpPosition.x += pFinger.getDeltaX();
+                    pElement.tmpPosition.y += pFinger.getDeltaY();
+                    pElement.tmpPosition.isUpdated = true;
+                }
+            });
+            finger.listenGesture(Fingers.gesture.Transform, null, function(pEventType, pData, pFingers) {
+                if(pEventType === Fingers.Gesture.EVENT_TYPE.move) {
+                    pElement.tmpPosition.rad += pData.deltaRotation;
+                    pElement.tmpPosition.scale = Math.max(0.5, Math.min(2, pElement.tmpPosition.scale * pData.deltaScale));
+                    pElement.tmpPosition.isUpdated = true;
+                }
+            });
+        }
+
+        function transform(pElement) {
+            if(pElement.tmpPosition.isUpdated) {
+                pElement.style.webkitTransform = "translateZ(0) " +
+                        "translate(" + pElement.tmpPosition.x + "px, " + pElement.tmpPosition.y + "px) " +
+                        "scale(" + pElement.tmpPosition.scale + ") " +
+                        "rotate(" + pElement.tmpPosition.rad + "rad) ";
+
+                pElement.tmpPosition.isUpdated = false;
+            }
+
+
+        }
+
+
+        function loop() {
+            transform(div1E);
+            transform(div2E);
+            transform(div3E);
+            transform(div4E);
+
+            requestAnimationFrame(loop);
+        }
+
+
+        //document.addEventListener('touchmove',function(event){event.preventDefault();});
+
+        init(div1E);
+        init(div2E);
+        init(div3E);
+        init(div4E);
+
+        listen(div1E);
+        listen(div2E);
+        listen(div3E);
+        listen(div4E);
+
+        loop();
+    </script>
+</body>
+</html>
