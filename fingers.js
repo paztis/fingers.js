@@ -85,6 +85,9 @@ Fingers.Utils = Utils;
 var Instance = function(pElement) {
     this._init(pElement);
 };
+Instance.HAS_TOUCHEVENTS = ('ontouchstart' in window);
+Instance.IS_MOBILE = /mobile|tablet|ip(ad|hone|od)|android|silk/i.test(navigator.userAgent);
+Instance.LISTEN_TOUCH_EVENTS = (Instance.HAS_TOUCHEVENTS && Instance.IS_MOBILE);
 
 Instance.prototype = {
     /**
@@ -136,18 +139,39 @@ Instance.prototype = {
 
     /*---- Native event listening ----*/
     _listenNativeEvents: function() {
-        this.element.addEventListener("touchstart", this._onTouchStart.bind(this));
-        this.element.addEventListener("touchend", this._onTouchEnd.bind(this));
-        this.element.addEventListener("touchcancel", this._onTouchCancel.bind(this));
-        this.element.addEventListener("touchmove", this._onTouchMove.bind(this));
+
+        if(Instance.LISTEN_TOUCH_EVENTS) {
+            this.element.addEventListener("touchstart", this._onTouchStart.bind(this));
+            this.element.addEventListener("touchmove", this._onTouchMove.bind(this));
+            this.element.addEventListener("touchend", this._onTouchEnd.bind(this));
+            this.element.addEventListener("touchcancel", this._onTouchCancel.bind(this));
+        }
+        else {
+            this._onMouseMoveF = this._onMouseMove.bind(this);
+            this._onMouseUpF = this._onMouseUp.bind(this);
+
+            this.element.addEventListener("mousedown", this._onMouseDown.bind(this));
+        }
     },
 
+    /*-------- Touch events ----*/
     _onTouchStart: function(pTouchEvent) {
         var touch;
         for(var i= 0, size=pTouchEvent.changedTouches.length; i<size; i++) {
             touch = pTouchEvent.changedTouches[i];
             this._createFinger(touch.identifier, pTouchEvent.timeStamp, touch.pageX, touch.pageY);
         }
+    },
+
+    _onTouchMove: function(pTouchEvent) {
+        var touch;
+        var finger;
+        for(var i= 0, size=pTouchEvent.changedTouches.length; i<size; i++) {
+            touch = pTouchEvent.changedTouches[i];
+            this._updateFingerPosition(touch.identifier, pTouchEvent.timeStamp, touch.pageX, touch.pageY);
+        }
+
+        pTouchEvent.preventDefault();
     },
 
     _onTouchEnd: function(pTouchEvent) {
@@ -168,15 +192,32 @@ Instance.prototype = {
         }
     },
 
-    _onTouchMove: function(pTouchEvent) {
-        var touch;
-        var finger;
-        for(var i= 0, size=pTouchEvent.changedTouches.length; i<size; i++) {
-            touch = pTouchEvent.changedTouches[i];
-            this._updateFingerPosition(touch.identifier, pTouchEvent.timeStamp, touch.pageX, touch.pageY);
-        }
+    /*-------- Mouse events ----*/
+    _onMouseDown: function(pMouseEvent) {
+        if(pMouseEvent.button === 0) {
+            document.addEventListener("mousemove", this._onMouseMoveF);
+            document.addEventListener("mouseup", this._onMouseUpF);
 
-        pTouchEvent.preventDefault();
+            this._createFinger(pMouseEvent.button, pMouseEvent.timeStamp, pMouseEvent.pageX, pMouseEvent.pageY);
+
+            pMouseEvent.preventDefault();
+        }
+    },
+
+    _onMouseMoveF: null,
+    _onMouseMove: function(pMouseEvent) {
+        if(pMouseEvent.button === 0) {
+            this._updateFingerPosition(pMouseEvent.button, pMouseEvent.timeStamp, pMouseEvent.pageX, pMouseEvent.pageY);
+        }
+    },
+
+    _onMouseUpF: null,
+    _onMouseUp: function(pMouseEvent) {
+        //In all cases, remove listener
+        document.removeEventListener("mousemove", this._onMouseMoveF);
+        document.removeEventListener("mouseup", this._onMouseUpF);
+
+        this._removeFinger(0);
     },
 
     /*---- Fingers ----*/
