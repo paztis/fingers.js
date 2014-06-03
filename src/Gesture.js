@@ -9,7 +9,7 @@
  */
 
 var Gesture = function(pOptions, pHandler) {
-    this._options = pOptions;
+    this.options = pOptions || {};
     this._handler = pHandler;
     this.listenedFingers = [];
     this._onFingerUpdateF = this._onFingerUpdate.bind(this);
@@ -23,7 +23,7 @@ Gesture.EVENT_TYPE = {
 
 Gesture.prototype = {
 
-    _options: null,
+    options: null,
     _handler: null,
     _onFingerUpdateF: null,
 

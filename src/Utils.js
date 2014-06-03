@@ -34,8 +34,8 @@ var Utils = {
         return direction === this.DIRECTION.UP || direction === this.DIRECTION.DOWN;
     },
 
-    getDistance: function(deltaX, deltaY) {
-        return Math.sqrt((deltaX * deltaX) + (deltaY * deltaY));
+    getDistance: function(x, y) {
+        return Math.sqrt((x * x) + (y * y));
     }
 };
 
