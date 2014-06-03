@@ -169,7 +169,7 @@ Instance.prototype = {
         this.fingerList = [];
         this.gestureList = [];
 
-        this._listenNativeEvents();
+        this.startListening();
     },
 
     getElement: function() {
@@ -185,19 +185,50 @@ Instance.prototype = {
     },
 
     /*---- Native event listening ----*/
-    _listenNativeEvents: function() {
+    startListening: function() {
+        if(this._stopListeningF == null) {
+            var _this = this;
+            if(Instance.LISTEN_TOUCH_EVENTS) {
+                var onTouchStartF = this._onTouchStart.bind(this);
+                var onTouchMoveF = this._onTouchMove.bind(this);
+                var onTouchEndF = this._onTouchEnd.bind(this);
+                var onTouchCancelF = this._onTouchCancel.bind(this);
 
-        if(Instance.LISTEN_TOUCH_EVENTS) {
-            this.element.addEventListener("touchstart", this._onTouchStart.bind(this));
-            this.element.addEventListener("touchmove", this._onTouchMove.bind(this));
-            this.element.addEventListener("touchend", this._onTouchEnd.bind(this));
-            this.element.addEventListener("touchcancel", this._onTouchCancel.bind(this));
+                this.element.addEventListener("touchstart", onTouchStartF);
+                this.element.addEventListener("touchmove", onTouchMoveF);
+                this.element.addEventListener("touchend", onTouchEndF);
+                this.element.addEventListener("touchcancel", onTouchCancelF);
+
+                this._stopListeningF = function() {
+                    _this.element.removeEventListener("touchstart", onTouchStartF);
+                    _this.element.removeEventListener("touchmove", onTouchMoveF);
+                    _this.element.removeEventListener("touchend", onTouchEndF);
+                    _this.element.removeEventListener("touchcancel", onTouchCancelF);
+                };
+            }
+            else {
+                this._onMouseMoveF = this._onMouseMove.bind(this);
+                this._onMouseUpF = this._onMouseUp.bind(this);
+
+                var onMouseDownF = this._onMouseDown.bind(this);
+                this.element.addEventListener("mousedown", onMouseDownF);
+
+                this._stopListeningF = function() {
+                    _this.element.removeEventListener("mousedown", onMouseDownF);
+                    document.removeEventListener("mousemove", this._onMouseMoveF);
+                    document.removeEventListener("mouseup", this._onMouseUpF);
+                };
+            }
         }
-        else {
-            this._onMouseMoveF = this._onMouseMove.bind(this);
-            this._onMouseUpF = this._onMouseUp.bind(this);
+    },
 
-            this.element.addEventListener("mousedown", this._onMouseDown.bind(this));
+    _stopListeningF: null,
+    stopListening: function() {
+        if(this._stopListeningF != null) {
+            this._removeAllFingers();
+
+            this._stopListeningF();
+            this._stopListeningF = null;
         }
     },
 
@@ -233,7 +264,7 @@ Instance.prototype = {
 
             if(this.fingerMap[pTouchEvent.changedTouches[i].identifier] != null) {
                 //Remove all fingers
-                this._removeAllFinger();
+                this._removeAllFingers();
                 break;
             }
         }
@@ -292,7 +323,7 @@ Instance.prototype = {
         }
     },
 
-    _removeAllFinger: function() {
+    _removeAllFingers: function() {
         var list = this.fingerList.splice(0);
         for(var i= 0, size=list.length; i<size; i++) {
 
