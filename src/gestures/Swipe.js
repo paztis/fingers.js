@@ -4,7 +4,6 @@
  * @class Swipe
  * @constructor
  * @param {Object} pOptions
- * @param {Function} pHandler
  * @return {Swipe}
  */
 

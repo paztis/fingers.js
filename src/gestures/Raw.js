@@ -4,7 +4,6 @@
  * @class Raw
  * @constructor
  * @param {Object} pOptions
- * @param {Function} pHandler
  * @return {Raw}
  */
 

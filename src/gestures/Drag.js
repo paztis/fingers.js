@@ -4,7 +4,6 @@
  * @class Drag
  * @constructor
  * @param {Object} pOptions
- * @param {Function} pHandler
  * @return {Drag}
  */
 

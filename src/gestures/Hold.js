@@ -4,7 +4,6 @@
  * @class Hold
  * @constructor
  * @param {Object} pOptions
- * @param {Function} pHandler
  * @return {Swipe}
  */
 

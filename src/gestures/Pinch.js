@@ -4,7 +4,6 @@
  * @class Pinch
  * @constructor
  * @param {Object} pOptions
- * @param {Function} pHandler
  * @return {Pinch}
  */
 

@@ -4,7 +4,6 @@
  * @class Tap
  * @constructor
  * @param {Object} pOptions
- * @param {Function} pHandler
  * @return {Swipe}
  */
 
