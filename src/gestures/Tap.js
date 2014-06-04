@@ -50,7 +50,7 @@ var Tap = (function (_super) {
                     this.lastTapTimestamp = pFinger.getTime();
                     this.nbTap++;
 
-                    this._handler(_super.EVENT_TYPE.end, this.nbTap, this.listenedFingers);
+                    this._handler(_super.EVENT_TYPE.instant, this.nbTap, this.listenedFingers);
                 }
             }
         },

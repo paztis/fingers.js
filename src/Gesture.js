@@ -17,6 +17,7 @@ var Gesture = function(pOptions, pHandler, pDefaultOptions) {
 };
 
 Gesture.EVENT_TYPE = {
+    instant: "instant",
     start: "start",
     end: "end",
     move: "move"

@@ -133,9 +133,11 @@ Fingers.CacheArray = CacheArray;
  * @param {HTMLElement} pElement
  * @return {Instance}
  */
+
 var Instance = function(pElement) {
     this._init(pElement);
 };
+
 Instance.HAS_TOUCHEVENTS = ('ontouchstart' in window);
 Instance.IS_MOBILE = /mobile|tablet|ip(ad|hone|od)|android|silk/i.test(navigator.userAgent);
 Instance.LISTEN_TOUCH_EVENTS = (Instance.HAS_TOUCHEVENTS && Instance.IS_MOBILE);
@@ -256,7 +258,6 @@ Instance.prototype = {
 
     _onTouchMove: function(pTouchEvent) {
         var touch;
-        var finger;
         for(var i= 0, size=pTouchEvent.changedTouches.length; i<size; i++) {
             touch = pTouchEvent.changedTouches[i];
             this._updateFingerPosition(touch.identifier, pTouchEvent.timeStamp, touch.pageX, touch.pageY);
@@ -609,6 +610,7 @@ Fingers.Position = Position;
  * @constructor
  * @param {Object} pOptions
  * @param {Function} pHandler
+ * @param {Object} pDefaultOptions
  * @return {Gesture}
  */
 
@@ -620,6 +622,7 @@ var Gesture = function(pOptions, pHandler, pDefaultOptions) {
 };
 
 Gesture.EVENT_TYPE = {
+    instant: "instant",
     start: "start",
     end: "end",
     move: "move"
@@ -804,7 +807,7 @@ var Hold = (function (_super) {
 
         _onHoldTimeLeftF: null,
         _onHoldTimeLeft: function() {
-            this._handler(_super.EVENT_TYPE.end, this.listenedFingers);
+            this._handler(_super.EVENT_TYPE.instant, this.listenedFingers);
         },
 
         _onHoldCancel: function() {
@@ -869,7 +872,7 @@ var Pinch = (function (_super) {
                 if(scale <= this.options.pinchInDetect || scale >= this.options.pinchOutDetect) {
                     this.data.grow = (scale > 1) ? Utils.GROW.OUT : Utils.GROW.IN;
                     this.data.scale = scale;
-                    this._handler(_super.EVENT_TYPE.end, this.data, this.listenedFingers);
+                    this._handler(_super.EVENT_TYPE.instant, this.data, this.listenedFingers);
                 }
 
                 this._removeAllListenedFingers();
@@ -1135,7 +1138,7 @@ var Swipe = (function (_super) {
                     this.data.direction = direction;
                     this.data.velocity = (velocityX > this.options.swipeVelocityX) ? velocityX : velocityY;
 
-                    this._handler(_super.EVENT_TYPE.end, this.data, this.listenedFingers);
+                    this._handler(_super.EVENT_TYPE.instant, this.data, this.listenedFingers);
                 }
 
                 this._removeAllListenedFingers();
@@ -1200,7 +1203,7 @@ var Tap = (function (_super) {
                     this.lastTapTimestamp = pFinger.getTime();
                     this.nbTap++;
 
-                    this._handler(_super.EVENT_TYPE.end, this.nbTap, this.listenedFingers);
+                    this._handler(_super.EVENT_TYPE.instant, this.nbTap, this.listenedFingers);
                 }
             }
         },
