@@ -19,7 +19,7 @@ var Transform = (function (_super) {
             deltaRotation: 0,
             totalScale: 1,
             deltaScale: 1
-        }
+        };
     }
 
     Fingers.__extend(Transform.prototype, _super.prototype, {

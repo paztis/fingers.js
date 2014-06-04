@@ -17,7 +17,7 @@ var Rotate = (function (_super) {
         this.data = {
             totalRotation: 0,
             deltaRotation: 0
-        }
+        };
     }
 
     Fingers.__extend(Rotate.prototype, _super.prototype, {

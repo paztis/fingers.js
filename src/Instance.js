@@ -59,8 +59,8 @@ Instance.prototype = {
     },
 
     /*---- gestures ----*/
-    listenGesture: function(pGesture, pOptions, pHandler) {
-        var gesture = new pGesture(pOptions, pHandler);
+    listenGesture: function(PGestureClass, pOptions, pHandler) {
+        var gesture = new PGestureClass(pOptions, pHandler);
         this.gestureList.push(gesture);
 
         return gesture;
@@ -68,7 +68,7 @@ Instance.prototype = {
 
     /*---- Native event listening ----*/
     startListening: function() {
-        if(this._stopListeningF == null) {
+        if(this._stopListeningF === null) {
             var _this = this;
             if(Instance.LISTEN_TOUCH_EVENTS) {
                 var onTouchStartF = this._onTouchStart.bind(this);
@@ -106,7 +106,7 @@ Instance.prototype = {
 
     _stopListeningF: null,
     stopListening: function() {
-        if(this._stopListeningF != null) {
+        if(this._stopListeningF !== null) {
             this._removeAllFingers();
 
             this._stopListeningF();
@@ -144,7 +144,7 @@ Instance.prototype = {
         //Security to prevent chrome bugs
         for(var i= 0, size=pTouchEvent.changedTouches.length; i<size; i++) {
 
-            if(this.fingerMap[pTouchEvent.changedTouches[i].identifier] != null) {
+            if(this.fingerMap[pTouchEvent.changedTouches[i].identifier] !== undefined) {
                 //Remove all fingers
                 this._removeAllFingers();
                 break;
@@ -194,8 +194,7 @@ Instance.prototype = {
 
     _removeFinger: function(pFingerId) {
         var finger = this.fingerMap[pFingerId];
-
-        if(finger != null) {
+        if(finger !== undefined) {
             for(var i=0, size=this.gestureList.length; i<size; i++) {
                 this.gestureList[i]._onFingerRemoved(finger);
             }
@@ -215,7 +214,7 @@ Instance.prototype = {
 
     _updateFingerPosition: function(pFingerId, pTimestamp, pX, pY) {
         var finger = this.fingerMap[pFingerId];
-        if(finger != null) {
+        if(finger !== undefined) {
             finger._setCurrentP(pTimestamp, pX, pY);
         }
     },

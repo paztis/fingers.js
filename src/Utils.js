@@ -23,7 +23,7 @@ var Utils = {
     },
 
     getAngle: function(x, y) {
-        return Math.atan2(x, y)
+        return Math.atan2(x, y);
     },
 
     getDirection: function(deltaX, deltaY) {

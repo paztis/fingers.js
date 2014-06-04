@@ -17,7 +17,7 @@ var Scale = (function (_super) {
         this.data = {
             totalScale: 1,
             deltaScale: 1
-        }
+        };
     }
 
     Fingers.__extend(Scale.prototype, _super.prototype, {

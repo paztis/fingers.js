@@ -47,7 +47,7 @@ var Utils = {
     },
 
     getAngle: function(x, y) {
-        return Math.atan2(x, y)
+        return Math.atan2(x, y);
     },
 
     getDirection: function(deltaX, deltaY) {
@@ -181,8 +181,8 @@ Instance.prototype = {
     },
 
     /*---- gestures ----*/
-    listenGesture: function(pGesture, pOptions, pHandler) {
-        var gesture = new pGesture(pOptions, pHandler);
+    listenGesture: function(PGestureClass, pOptions, pHandler) {
+        var gesture = new PGestureClass(pOptions, pHandler);
         this.gestureList.push(gesture);
 
         return gesture;
@@ -190,7 +190,7 @@ Instance.prototype = {
 
     /*---- Native event listening ----*/
     startListening: function() {
-        if(this._stopListeningF == null) {
+        if(this._stopListeningF === null) {
             var _this = this;
             if(Instance.LISTEN_TOUCH_EVENTS) {
                 var onTouchStartF = this._onTouchStart.bind(this);
@@ -228,7 +228,7 @@ Instance.prototype = {
 
     _stopListeningF: null,
     stopListening: function() {
-        if(this._stopListeningF != null) {
+        if(this._stopListeningF !== null) {
             this._removeAllFingers();
 
             this._stopListeningF();
@@ -266,7 +266,7 @@ Instance.prototype = {
         //Security to prevent chrome bugs
         for(var i= 0, size=pTouchEvent.changedTouches.length; i<size; i++) {
 
-            if(this.fingerMap[pTouchEvent.changedTouches[i].identifier] != null) {
+            if(this.fingerMap[pTouchEvent.changedTouches[i].identifier] !== undefined) {
                 //Remove all fingers
                 this._removeAllFingers();
                 break;
@@ -316,8 +316,7 @@ Instance.prototype = {
 
     _removeFinger: function(pFingerId) {
         var finger = this.fingerMap[pFingerId];
-
-        if(finger != null) {
+        if(finger !== undefined) {
             for(var i=0, size=this.gestureList.length; i<size; i++) {
                 this.gestureList[i]._onFingerRemoved(finger);
             }
@@ -337,7 +336,7 @@ Instance.prototype = {
 
     _updateFingerPosition: function(pFingerId, pTimestamp, pX, pY) {
         var finger = this.fingerMap[pFingerId];
-        if(finger != null) {
+        if(finger !== undefined) {
             finger._setCurrentP(pTimestamp, pX, pY);
         }
     },
@@ -651,7 +650,7 @@ Gesture.prototype = {
         var index = this.listenedFingers.indexOf(pFinger);
         this.listenedFingers.splice(index, 1);
 
-        if(this.listenedFingers.length == 0) {
+        if(this.listenedFingers.length === 0) {
             this.isListening = false;
         }
     },
@@ -755,7 +754,7 @@ var Pinch = (function (_super) {
         this.data = {
             grow: null,
             scale: 1
-        }
+        };
     }
 
     Fingers.__extend(Pinch.prototype, _super.prototype, {
@@ -865,7 +864,7 @@ var Rotate = (function (_super) {
         this.data = {
             totalRotation: 0,
             deltaRotation: 0
-        }
+        };
     }
 
     Fingers.__extend(Rotate.prototype, _super.prototype, {
@@ -932,7 +931,7 @@ var Scale = (function (_super) {
         this.data = {
             totalScale: 1,
             deltaScale: 1
-        }
+        };
     }
 
     Fingers.__extend(Scale.prototype, _super.prototype, {
@@ -1006,7 +1005,7 @@ var Swipe = (function (_super) {
         this.data = {
             direction: null,
             velocity: 0
-        }
+        };
     }
 
     Fingers.__extend(Swipe.prototype, _super.prototype, {
@@ -1081,7 +1080,7 @@ var Transform = (function (_super) {
             deltaRotation: 0,
             totalScale: 1,
             deltaScale: 1
-        }
+        };
     }
 
     Fingers.__extend(Transform.prototype, _super.prototype, {

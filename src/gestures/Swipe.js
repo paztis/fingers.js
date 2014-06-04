@@ -24,7 +24,7 @@ var Swipe = (function (_super) {
         this.data = {
             direction: null,
             velocity: 0
-        }
+        };
     }
 
     Fingers.__extend(Swipe.prototype, _super.prototype, {

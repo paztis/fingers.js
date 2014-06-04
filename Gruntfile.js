@@ -50,13 +50,23 @@ module.exports = function(grunt) {
                     'fingers.min.js': ['fingers.js']
                 }
             }
+        },
+        jshint: {
+            options: {
+                jshintrc: true
+            },
+            build: {
+                src: ['fingers.js']
+            }
         }
     });
 
     // Load the plugin that provides the "uglify" task.
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-jshint');
 
     // Default task(s).
-    grunt.registerTask('default', ['concat', 'uglify']);
+    grunt.registerTask('default', ['concat', 'uglify', 'test']);
+    grunt.registerTask('test', ['jshint']);
 };

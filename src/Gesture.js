@@ -63,7 +63,7 @@ Gesture.prototype = {
         var index = this.listenedFingers.indexOf(pFinger);
         this.listenedFingers.splice(index, 1);
 
-        if(this.listenedFingers.length == 0) {
+        if(this.listenedFingers.length === 0) {
             this.isListening = false;
         }
     },

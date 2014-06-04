@@ -23,7 +23,7 @@ var Pinch = (function (_super) {
         this.data = {
             grow: null,
             scale: 1
-        }
+        };
     }
 
     Fingers.__extend(Pinch.prototype, _super.prototype, {
