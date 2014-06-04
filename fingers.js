@@ -181,7 +181,7 @@ Instance.prototype = {
     },
 
     /*---- gestures ----*/
-    listenGesture: function(PGestureClass, pOptions, pHandler) {
+    addGesture: function(PGestureClass, pOptions, pHandler) {
         var gesture = new PGestureClass(pOptions, pHandler);
         this.gestureList.push(gesture);
 

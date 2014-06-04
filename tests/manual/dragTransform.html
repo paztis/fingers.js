@@ -47,7 +47,7 @@
         function listen(pBoxO) {
 
             var finger = new Fingers(pBoxO.element);
-            finger.listenGesture(Fingers.gesture.Drag, null, function(pEventType, pFinger) {
+            finger.addGesture(Fingers.gesture.Drag, null, function(pEventType, pFinger) {
                 if(pEventType === Fingers.Gesture.EVENT_TYPE.move) {
                     pBoxO.x += pFinger.getDeltaX();
                     pBoxO.y += pFinger.getDeltaY();
@@ -59,7 +59,7 @@
                     pBoxO.isUpdated = true;
                 }
             });
-            finger.listenGesture(Fingers.gesture.Transform, null, function(pEventType, pData, pFingers) {
+            finger.addGesture(Fingers.gesture.Transform, null, function(pEventType, pData, pFingers) {
                 if(pEventType === Fingers.Gesture.EVENT_TYPE.move) {
                     pBoxO.rad += pData.deltaRotation;
                     pBoxO.scale = Math.max(0.5, Math.min(2, pBoxO.scale * pData.deltaScale));

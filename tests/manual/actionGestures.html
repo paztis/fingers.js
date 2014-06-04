@@ -48,7 +48,7 @@
         function listenSwipe(pElement, pLabelElement, pNbFingers) {
 
             var finger = new Fingers(pElement);
-            finger.listenGesture(Fingers.gesture.Swipe, {
+            finger.addGesture(Fingers.gesture.Swipe, {
                 nbFingers: pNbFingers
             }, function(pEventType, pData, pFingers) {
                 updateLabel(pLabelElement, "Swipe " + pData.direction + "<br/>Velocity: "+ pData.velocity.toFixed(2) + " px/ms");
@@ -58,7 +58,7 @@
         function listenPinch(pElement, pLabelElement) {
 
             var finger = new Fingers(pElement);
-            finger.listenGesture(Fingers.gesture.Pinch, null, function(pEventType, pData, pFingers) {
+            finger.addGesture(Fingers.gesture.Pinch, null, function(pEventType, pData, pFingers) {
                 updateLabel(pLabelElement, "Pinch " + pData.grow + "<br/>Scale: "+ pData.scale.toFixed(2));
             });
         };
@@ -66,7 +66,7 @@
         function listenHold(pElement, pLabelElement, pNbFingers) {
 
             var finger = new Fingers(pElement);
-            finger.listenGesture(Fingers.gesture.Hold, {
+            finger.addGesture(Fingers.gesture.Hold, {
                 nbFingers: pNbFingers
             }, function(pEventType, pData, pFingers) {
                 updateLabel(pLabelElement, "Hold");
@@ -76,7 +76,7 @@
         function listenTap(pElement, pLabelElement, pNbFingers) {
 
             var finger = new Fingers(pElement);
-            finger.listenGesture(Fingers.gesture.Tap, {
+            finger.addGesture(Fingers.gesture.Tap, {
                 nbFingers: pNbFingers
             }, function(pEventType, pNbTap, pFingers) {
                 updateLabel(pLabelElement, "Tap<br/>" + pNbTap + "x");

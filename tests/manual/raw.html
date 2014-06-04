@@ -31,6 +31,7 @@
 
     <script>
 
+//        document.addEventListener('touchmove',function(event){event.preventDefault();});
         COLOR_MAP = {};
 
         this.onload = function() {
@@ -57,7 +58,7 @@
         function listen(pElement, pContext) {
 
             var finger = new Fingers(pElement);
-            finger.listenGesture(Fingers.gesture.Raw, null, function(pEventType, pFinger) {
+            finger.addGesture(Fingers.gesture.Raw, null, function(pEventType, pFinger) {
                 if(pEventType === Fingers.Gesture.EVENT_TYPE.move) {
                     moveLine(pContext, pFinger);
                 }
