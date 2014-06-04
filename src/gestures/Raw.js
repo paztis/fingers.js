@@ -33,7 +33,7 @@ var Raw = (function (_super) {
             if(this.isListenedFinger(pFinger)) {
                 this.fire(_super.EVENT_TYPE.end, pFinger);
 
-                this._removeAllListenedFingers();
+                this._removeListenedFinger(pFinger);
             }
         }
     });
