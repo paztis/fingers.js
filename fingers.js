@@ -181,11 +181,20 @@ Instance.prototype = {
     },
 
     /*---- gestures ----*/
+    getGestures: function() {
+        return this.gestureList;
+    },
+
     addGesture: function(PGestureClass, pOptions, pHandler) {
         var gesture = new PGestureClass(pOptions, pHandler);
         this.gestureList.push(gesture);
 
         return gesture;
+    },
+
+    removeGesture: function(pGesture) {
+        var index = this.gestureList.indexOf(pGesture);
+        this.gestureList.splice(index, 1);
     },
 
     /*---- Native event listening ----*/
