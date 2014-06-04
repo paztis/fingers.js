@@ -591,8 +591,8 @@ Fingers.Position = Position;
  * @return {Gesture}
  */
 
-var Gesture = function(pOptions, pHandler) {
-    this.options = pOptions || {};
+var Gesture = function(pOptions, pHandler, pDefaultOptions) {
+    this.options = Fingers.__extend({}, pDefaultOptions || {}, pOptions || {});
     this._handler = pHandler;
     this.listenedFingers = [];
     this._onFingerUpdateF = this._onFingerUpdate.bind(this);
@@ -707,7 +707,7 @@ var Drag = (function (_super) {
             }
         },
 
-        _onFingerUpdate: function() {
+        _onFingerUpdate: function(pFinger) {
             this._handler(_super.EVENT_TYPE.move, this.listenedFingers[0]);
         },
 
@@ -763,7 +763,7 @@ var Pinch = (function (_super) {
             }
         },
 
-        _onFingerUpdate: function() {
+        _onFingerUpdate: function(pFinger) {
             var newDistance = this._getFingersDistance();
             this.data.totalScale = newDistance / this._startDistance;
             this.data.deltaScale = newDistance / this._lastDistance;
@@ -821,7 +821,6 @@ var Raw = (function (_super) {
         },
 
         _onFingerUpdate: function(pFinger) {
-            console.log(pFinger);
             this._handler(_super.EVENT_TYPE.move, pFinger);
         },
 
@@ -877,7 +876,7 @@ var Rotate = (function (_super) {
             }
         },
 
-        _onFingerUpdate: function() {
+        _onFingerUpdate: function(pFinger) {
             var newAngle = this._getFingersAngle();
             this.data.totalRotation = this._startAngle - newAngle;
             this.data.deltaRotation = this._lastAngle - newAngle;
@@ -917,35 +916,66 @@ Fingers.gesture.Rotate = Rotate;
  */
 
 
+
 var Swipe = (function (_super) {
 
-    function Swipe(pOptions, pHandler) {
-        _super.call(this, pOptions, pHandler);
-    }
-
-    Swipe.default = {
+    var DEFAULT_OPTIONS = {
+        nbFingers: 1,
         swipeVelocityX: 0.6,
         swipeVelocityY: 0.6
     };
 
+    function Swipe(pOptions, pHandler) {
+        _super.call(this, pOptions, pHandler, DEFAULT_OPTIONS);
+
+        this.data = {
+            direction: null,
+            velocity: 0
+        }
+    }
+
     Fingers.__extend(Swipe.prototype, _super.prototype, {
 
+        data: null,
+
         _onFingerAdded: function(pNewFinger, pFingerList) {
-            if(!this.isListening) {
-                this._addListenedFingers(pNewFinger);
+            if(!this.isListening && pFingerList.length >= this.options.nbFingers) {
+                for(var i=0; i<this.options.nbFingers; i++) {
+                    this._addListenedFinger(pFingerList[i]);
+                }
             }
         },
 
-        _onFingerUpdate: function() {
+        _onFingerUpdate: function(pFinger) {
         },
 
         _onFingerRemoved: function(pFinger) {
             if(this.isListenedFinger(pFinger)) {
-                var swipeVelocityX = this.options.swipeVelocityX || Swipe.default.swipeVelocityX;
-                var swipeVelocityY = this.options.swipeVelocityY || Swipe.default.swipeVelocityY;
 
-                if(pFinger.getVelocityX() > swipeVelocityX || pFinger.getVelocityY() > swipeVelocityY) {
-                    this._handler(_super.EVENT_TYPE.end, pFinger.getDeltaDirection(), this.listenedFingers[0]);
+                var isSameDirection = true;
+                var direction = this.listenedFingers[0].getDirection();
+                var velocityX = 0;
+                var velocityY = 0;
+
+                var size = this.listenedFingers.length;
+                for(var i= 0; i<size; i++) {
+                    isSameDirection = isSameDirection && (direction === this.listenedFingers[i].getDirection());
+
+                    velocityX += this.listenedFingers[i].getVelocityX();
+                    velocityY += this.listenedFingers[i].getVelocityY();
+                }
+//                velocityX /= size;
+//                velocityY /= size;
+
+                console.log(isSameDirection)
+                console.log(velocityX+" "+this.options.swipeVelocityX)
+                console.log(velocityY+" "+this.options.swipeVelocityY)
+                if(isSameDirection &&
+                    (velocityX > this.options.swipeVelocityX || pFinger.getVelocityY() > this.options.swipeVelocityY)) {
+                    this.data.direction = direction;
+                    this.data.velocity = (velocityX > this.options.swipeVelocityX) ? velocityX : velocityY;
+
+                    this._handler(_super.EVENT_TYPE.end, this.data, this.listenedFingers);
                 }
 
                 this._removeAllListenedFingers();
@@ -1003,7 +1033,7 @@ var Transform = (function (_super) {
             }
         },
 
-        _onFingerUpdate: function() {
+        _onFingerUpdate: function(pFinger) {
             var newAngle = this._getFingersAngle();
             this.data.totalRotation = this._startAngle - newAngle;
             this.data.deltaRotation = this._lastAngle - newAngle;

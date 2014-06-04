@@ -15,34 +15,59 @@
     <title>Basic Tests</title>
     <script src="../../fingers.js"></script>
     <style>
-        #testDiv1 {
-            position: absolute;
-            top: 50px; left: 50px;
+        .testDiv {
+            display: inline-block;
             width: 200px; height: 200px;
+            margin: 20px;
             background-color: black;
             color: white;
             text-align: center;
             line-height: 200px;
         }
+
+        .innerLabel {
+            display: inline-block;
+            line-height: normal;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
-    <div id="testDiv1">Swipe Me</div>
+    <div id="testDiv1" class="testDiv"><div class="innerLabel">Swipe Me<br/>with 1 finger</div></div>
+    <div id="testDiv2" class="testDiv"><div class="innerLabel">Swipe Me<br/>with 2 fingers</div></div>
+    <div id="testDiv3" class="testDiv"><div class="innerLabel">Swipe Me<br/>with 3 fingers</div></div>
+    <div id="testDiv4" class="testDiv"><div class="innerLabel">Swipe Me<br/>with 4 fingers</div></div>
     <script>
 
-        var div1E = document.getElementById("testDiv1");
 
-        function listen(pElement) {
+        function listen(pElement, pLabelElement, pNbFingers) {
 
             var finger = new Fingers(pElement);
-            finger.listenGesture(Fingers.gesture.Swipe, null, function(pEventType, pDirection, pFinger) {
+            finger.listenGesture(Fingers.gesture.Swipe, {
+                nbFingers: pNbFingers
+            }, function(pEventType, pData, pFinger) {
                 if(pEventType === Fingers.Gesture.EVENT_TYPE.end) {
-                    pElement.innerHTML = pDirection;
+                    var originalLabel = pLabelElement.innerHTML;
+                    pLabelElement.innerHTML = "Swipe " + pData.direction;
+
+                    setTimeout(function() {
+                        pLabelElement.innerHTML = originalLabel;
+                    }, 500)
                 }
             });
         }
 
-        listen(div1E);
+        var div1E = document.getElementById("testDiv1");
+        listen(div1E, div1E.querySelector(".innerLabel"), 1);
+
+        var div2E = document.getElementById("testDiv2");
+        listen(div2E, div2E.querySelector(".innerLabel"), 2);
+
+        var div3E = document.getElementById("testDiv3");
+        listen(div3E, div3E.querySelector(".innerLabel"), 3);
+
+        var div4E = document.getElementById("testDiv4");
+        listen(div4E, div4E.querySelector(".innerLabel"), 4);
     </script>
 </body>
 </html>

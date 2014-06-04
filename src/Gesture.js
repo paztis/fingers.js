@@ -8,8 +8,8 @@
  * @return {Gesture}
  */
 
-var Gesture = function(pOptions, pHandler) {
-    this.options = pOptions || {};
+var Gesture = function(pOptions, pHandler, pDefaultOptions) {
+    this.options = Fingers.__extend({}, pDefaultOptions || {}, pOptions || {});
     this._handler = pHandler;
     this.listenedFingers = [];
     this._onFingerUpdateF = this._onFingerUpdate.bind(this);
