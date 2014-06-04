@@ -1,45 +1,45 @@
 /**
  * @module gestures
  *
- * @class Drag
+ * @class Raw
  * @constructor
  * @param {Object} pOptions
  * @param {Function} pHandler
- * @return {Drag}
+ * @return {Raw}
  */
 
 
-var Drag = (function (_super) {
+var Raw = (function (_super) {
 
-    function Drag(pOptions, pHandler) {
+    function Raw(pOptions, pHandler) {
         _super.call(this, pOptions, pHandler);
     }
 
 
-    Fingers.__extend(Drag.prototype, _super.prototype, {
+    Fingers.__extend(Raw.prototype, _super.prototype, {
 
         _onFingerAdded: function(pNewFinger, pFingerList) {
-            if(!this.isListening) {
+//            if(!this.isListening) {
                 this._addListenedFinger(pNewFinger);
 
-                this._handler(_super.EVENT_TYPE.start, this.listenedFingers[0]);
-            }
+                this._handler(_super.EVENT_TYPE.start, pNewFinger);
+//            }
         },
 
         _onFingerUpdate: function(pFinger) {
-            this._handler(_super.EVENT_TYPE.move, this.listenedFingers[0]);
+            this._handler(_super.EVENT_TYPE.move, pFinger);
         },
 
         _onFingerRemoved: function(pFinger) {
             if(this.isListenedFinger(pFinger)) {
-                this._handler(_super.EVENT_TYPE.end, this.listenedFingers[0]);
+                this._handler(_super.EVENT_TYPE.end, pFinger);
 
                 this._removeAllListenedFingers();
             }
         }
     });
 
-    return Drag;
+    return Raw;
 })(Fingers.Gesture);
 
-Fingers.gesture.Drag = Drag;
+Fingers.gesture.Raw = Raw;

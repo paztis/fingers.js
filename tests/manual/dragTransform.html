@@ -12,111 +12,81 @@
     <META http-equiv="Pragma" content="no-cache">
     <META http-equiv="Expires" content="0">
 
-    <title>Basic Tests</title>
+    <title>Drag and Transform</title>
     <script src="../../fingers.js"></script>
     <style>
-        #testDiv1 {
+        .box {
             position: absolute;
-            top: 50px; left: 50px;
-            width: 200px; height: 200px;
-            background-color: black;
-            color: white;
+            width: 200px; height: 300px;
+            color: #FFF;
             text-align: center;
-            line-height: 200px;
-        }
-
-        #testDiv2 {
-            position: absolute;
-            top: 50px; left: 250px;
-            width: 200px; height: 200px;
-            background-color: red;
-            color: black;
-            text-align: center;
-            line-height: 200px;
-        }
-
-        #testDiv3 {
-            position: absolute;
-            top: 250px; left: 50px;
-            width: 200px; height: 200px;
-            background-color: green;
-            color: black;
-            text-align: center;
-            line-height: 200px;
-        }
-
-        #testDiv4 {
-            position: absolute;
-            top: 250px; left: 250px;
-            width: 200px; height: 200px;
-            background-color: blue;
-            color: white;
-            text-align: center;
-            line-height: 200px;
+            line-height: 321px;
         }
     </style>
-</head>
-<body>
-    <div id="testDiv1">1</div>
-    <div id="testDiv2">2</div>
-    <div id="testDiv3">3</div>
-    <div id="testDiv4">4</div>
     <script>
 
-        var div1E = document.getElementById("testDiv1");
-        var div2E = document.getElementById("testDiv2");
-        var div3E = document.getElementById("testDiv3");
-        var div4E = document.getElementById("testDiv4");
+        function createBox(pLabel, pBgColor) {
+            var divE = document.createElement("div");
+            divE.className = "box";
+            divE.style.backgroundColor = pBgColor;
+            divE.innerHTML = pLabel;
 
-        function init(pElement) {
-            pElement.tmpPosition = {
-                isUpdated: false,
-                x: 0,
-                y: 0,
-                rad: 0,
+            document.body.appendChild(divE);
+            return {
+                element: divE,
+                isUpdated: true,
+                x: Math.random() * (window.innerWidth - 200),
+                y: Math.random() * (window.innerHeight - 300),
+                rad: Math.random()*Math.PI * 2,
                 scale: 1,
-                rafId: 0
-            };
+                rafId: 0,
+                zIndex: 0
+            }
         }
 
-        function listen(pElement) {
+        function listen(pBoxO) {
 
-            var finger = new Fingers(pElement);
+            var finger = new Fingers(pBoxO.element);
             finger.listenGesture(Fingers.gesture.Drag, null, function(pEventType, pFinger) {
                 if(pEventType === Fingers.Gesture.EVENT_TYPE.move) {
-                    pElement.tmpPosition.x += pFinger.getDeltaX();
-                    pElement.tmpPosition.y += pFinger.getDeltaY();
-                    pElement.tmpPosition.isUpdated = true;
+                    pBoxO.x += pFinger.getDeltaX();
+                    pBoxO.y += pFinger.getDeltaY();
+                    pBoxO.isUpdated = true;
+                }
+                else if(pEventType === Fingers.Gesture.EVENT_TYPE.start) {
+                    topZIndex++;
+                    pBoxO.zIndex = topZIndex;
+                    pBoxO.isUpdated = true;
                 }
             });
             finger.listenGesture(Fingers.gesture.Transform, null, function(pEventType, pData, pFingers) {
                 if(pEventType === Fingers.Gesture.EVENT_TYPE.move) {
-                    pElement.tmpPosition.rad += pData.deltaRotation;
-                    pElement.tmpPosition.scale = Math.max(0.5, Math.min(2, pElement.tmpPosition.scale * pData.deltaScale));
-                    pElement.tmpPosition.isUpdated = true;
+                    pBoxO.rad += pData.deltaRotation;
+                    pBoxO.scale = Math.max(0.5, Math.min(2, pBoxO.scale * pData.deltaScale));
+                    pBoxO.isUpdated = true;
                 }
             });
         }
 
-        function transform(pElement) {
-            if(pElement.tmpPosition.isUpdated) {
-                pElement.style.webkitTransform = "translateZ(0) " +
-                        "translate(" + pElement.tmpPosition.x + "px, " + pElement.tmpPosition.y + "px) " +
-                        "scale(" + pElement.tmpPosition.scale + ") " +
-                        "rotate(" + pElement.tmpPosition.rad + "rad) ";
-
-                pElement.tmpPosition.isUpdated = false;
+        function transform(pBoxO) {
+            if(pBoxO.isUpdated) {
+                pBoxO.element.style.webkitTransform = "translateZ(0) " +
+                        "translate(" + pBoxO.x + "px, " + pBoxO.y + "px) " +
+                        "scale(" + pBoxO.scale + ") " +
+                        "rotate(" + pBoxO.rad + "rad) ";
+                pBoxO.element.style.zIndex = pBoxO.zIndex;
+                pBoxO.isUpdated = false;
             }
-
-
         }
 
+        function generateHexColor() {
+            return '#'+Math.random().toString(16).substr(-6);
+        }
 
         function loop() {
-            transform(div1E);
-            transform(div2E);
-            transform(div3E);
-            transform(div4E);
+            for(var i=0; i<boxListLength; i++) {
+                transform(boxList[i]);
+            }
 
             requestAnimationFrame(loop);
         }
@@ -124,17 +94,33 @@
 
         //document.addEventListener('touchmove',function(event){event.preventDefault();});
 
-        init(div1E);
-        init(div2E);
-        init(div3E);
-        init(div4E);
 
-        listen(div1E);
-        listen(div2E);
-        listen(div3E);
-        listen(div4E);
 
-        loop();
+
+        var boxList = [];
+        var boxListLength = 0;
+        var topZIndex = 0;
+
+
+        this.onload = function() {
+            for(var i=0; i<10; i++) {
+                var boxO = createBox("box " + (i+1), generateHexColor());
+                boxList.push(boxO);
+
+                transform(boxO);
+            }
+
+            boxListLength = boxList.length;
+            for(var i=0; i<boxListLength; i++) {
+                listen(boxList[i]);
+            }
+
+            loop();
+        }
+
+
     </script>
+</head>
+<body>
 </body>
 </html>

@@ -20,15 +20,15 @@ var Pinch = (function (_super) {
         }
     }
 
-    __extend(Pinch.prototype, _super.prototype, {
+    Fingers.__extend(Pinch.prototype, _super.prototype, {
 
         _startDistance: 0,
         _lastDistance: 0,
         data: null,
 
-        _onFingerAddedImpl: function(pFingerList) {
-            if(pFingerList.length >= 2) {
-                this._startListeningFingers(pFingerList[0], pFingerList[1]);
+        _onFingerAdded: function(pNewFinger, pFingerList) {
+            if(!this.isListening && pFingerList.length >= 2) {
+                this._addListenedFingers(pFingerList[0], pFingerList[1]);
 
                 this._handler(_super.EVENT_TYPE.start, 1, this.listenedFingers);
                 this._lastDistance = this._getFingersDistance();
@@ -36,7 +36,7 @@ var Pinch = (function (_super) {
             }
         },
 
-        _onFingerUpdate: function() {
+        _onFingerUpdate: function(pFinger) {
             var newDistance = this._getFingersDistance();
             this.data.totalScale = newDistance / this._startDistance;
             this.data.deltaScale = newDistance / this._lastDistance;
@@ -45,10 +45,12 @@ var Pinch = (function (_super) {
             this._handler(_super.EVENT_TYPE.move, this.data, this.listenedFingers);
         },
 
-        _onFingerRemovedImpl: function(pFinger) {
-            this._handler(_super.EVENT_TYPE.end, 1, this.listenedFingers);
+        _onFingerRemoved: function(pFinger) {
+            if(this.isListenedFinger(pFinger)) {
+                this._handler(_super.EVENT_TYPE.end, 1, this.listenedFingers);
 
-            this._stopListeningFingers();
+                this._removeAllListenedFingers();
+            }
         },
 
         _getFingersDistance: function() {

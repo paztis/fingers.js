@@ -25,39 +25,50 @@ Gesture.prototype = {
 
     options: null,
     _handler: null,
-    _onFingerUpdateF: null,
 
     isListening: false,
     listenedFingers: null,
 
-    _onFingerAdded: function(pFingerList) {
-        if(!this.isListening) {
-            this._onFingerAddedImpl(pFingerList);
-        }
-    },
-    _onFingerAddedImpl: function(pFingerList) {},
+    /*---- Fingers events ----*/
+    _onFingerAdded: function(pNewFinger, pFingerList) { /*To Override*/ },
 
-    _onFingerUpdate: function() {},
+    _onFingerUpdateF: null,
+    _onFingerUpdate: function(pFinger) { /*To Override*/ },
 
-    _onFingerRemoved: function(pFinger) {
-        if(this.isListening && this.listenedFingers.indexOf(pFinger) > -1) {
-            this._onFingerRemovedImpl(pFinger);
-        }
-    },
+    _onFingerRemoved: function(pFinger) { /*To Override*/ },
 
-    _startListeningFingers: function(pFinger1, pFinger2, pFinger3) {
-        var finger;
+    /*---- Actions ----*/
+    _addListenedFingers: function(pFinger1, pFinger2, pFinger3) {
         for(var i= 0, size=arguments.length; i<size; i++) {
-            finger = arguments[i];
-            this.listenedFingers.push(finger);
-
-            finger._addHandler(this._onFingerUpdateF);
+            this._addListenedFinger(arguments[i]);
         }
+    },
+    _addListenedFinger: function(pFinger) {
+        this.listenedFingers.push(pFinger);
+        pFinger._addHandler(this._onFingerUpdateF);
 
-        this.isListening = true;
+        if(!this.isListening) {
+            this.isListening = true;
+        }
     },
 
-    _stopListeningFingers: function() {
+    _removeListenedFingers: function(pFinger1, pFinger2, pFinger3) {
+        for(var i= 0, size=arguments.length; i<size; i++) {
+            this._removeListenedFinger(arguments[i]);
+        }
+    },
+    _removeListenedFinger: function(pFinger) {
+        pFinger._removeHandler(this._onFingerUpdateF);
+
+        var index = this.listenedFingers.indexOf(pFinger);
+        this.listenedFingers.splice(index, 1);
+
+        if(this.listenedFingers.length == 0) {
+            this.isListening = false;
+        }
+    },
+
+    _removeAllListenedFingers: function() {
         var finger;
         for(var i= 0, size=this.listenedFingers.length; i<size; i++) {
             finger = this.listenedFingers[i];
@@ -67,6 +78,15 @@ Gesture.prototype = {
 
         this.listenedFingers.length = 0;
         this.isListening = false;
+    },
+
+    /*---- Utils ----*/
+    isListenedFinger: function(pFinger) {
+        return (this.isListening && this.getListenedPosition(pFinger) > -1);
+    },
+
+    getListenedPosition: function(pFinger) {
+        return this.listenedFingers.indexOf(pFinger);
     }
 };
 

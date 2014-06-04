@@ -1,5 +1,9 @@
 
-var __extend = function(obj) {
+var Fingers = function Fingers(pElement) {
+    return new Fingers.Instance(pElement);
+};
+
+Fingers.__extend = function(obj) {
     Array.prototype.slice.call(arguments, 1).forEach(function(source) {
         if (source) {
             for (var prop in source) {
@@ -8,9 +12,4 @@ var __extend = function(obj) {
         }
     });
     return obj;
-};
-
-
-var Fingers = function Fingers(pElement) {
-    return new Fingers.Instance(pElement);
 };

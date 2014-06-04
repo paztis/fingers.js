@@ -72,7 +72,7 @@ Finger.prototype = {
         this.currentP.set(pTimestamp, pX, pY);
 
         for(var i= 0; i<this._handlerListSize; i++) {
-            this._handlerList[i]();
+            this._handlerList[i](this);
         }
     },
 
@@ -93,6 +93,15 @@ Finger.prototype = {
     },
     _getTotalTime: function() {
         return this.currentP.timestamp - this.startP.timestamp;
+    },
+
+    /*---- position ----*/
+    getX: function() {
+        return this.currentP.x;
+    },
+
+    getY: function() {
+        return this.currentP.y;
     },
 
     /*---- distance ----*/

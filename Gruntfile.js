@@ -29,6 +29,7 @@ module.exports = function(grunt) {
                     'src/gestures/module.js',
                     'src/gestures/Drag.js',
                     'src/gestures/Pinch.js',
+                    'src/gestures/Raw.js',
                     'src/gestures/Rotate.js',
                     'src/gestures/Swipe.js',
                     'src/gestures/Transform.js',

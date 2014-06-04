@@ -188,7 +188,7 @@ Instance.prototype = {
         this.fingerList.push(finger);
 
         for(var i=0, size=this.gestureList.length; i<size; i++) {
-            this.gestureList[i]._onFingerAdded(this.fingerList);
+            this.gestureList[i]._onFingerAdded(finger, this.fingerList);
         }
     },
 

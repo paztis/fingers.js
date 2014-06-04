@@ -20,15 +20,15 @@ var Rotate = (function (_super) {
         }
     }
 
-    __extend(Rotate.prototype, _super.prototype, {
+    Fingers.__extend(Rotate.prototype, _super.prototype, {
 
         _startAngle: 0,
         _lastAngle: 0,
         data: null,
 
-        _onFingerAddedImpl: function(pFingerList) {
-            if(pFingerList.length >= 2) {
-                this._startListeningFingers(pFingerList[0], pFingerList[1]);
+        _onFingerAdded: function(pNewFinger, pFingerList) {
+            if(!this.isListening && pFingerList.length >= 2) {
+                this._addListenedFingers(pFingerList[0], pFingerList[1]);
 
                 this._handler(_super.EVENT_TYPE.start, 0, this.listenedFingers);
                 this._lastAngle = this._getFingersAngle();
@@ -36,7 +36,7 @@ var Rotate = (function (_super) {
             }
         },
 
-        _onFingerUpdate: function() {
+        _onFingerUpdate: function(pFinger) {
             var newAngle = this._getFingersAngle();
             this.data.totalRotation = this._startAngle - newAngle;
             this.data.deltaRotation = this._lastAngle - newAngle;
@@ -45,10 +45,12 @@ var Rotate = (function (_super) {
             this._handler(_super.EVENT_TYPE.move, this.data, this.listenedFingers);
         },
 
-        _onFingerRemovedImpl: function(pFinger) {
-            this._handler(_super.EVENT_TYPE.end, 0, this.listenedFingers);
+        _onFingerRemoved: function(pFinger) {
+            if(this.isListenedFinger(pFinger)) {
+                this._handler(_super.EVENT_TYPE.end, 0, this.listenedFingers);
 
-            this._stopListeningFingers();
+                this._removeAllListenedFingers();
+            }
         },
 
         _getFingersAngle: function() {
