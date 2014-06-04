@@ -30,7 +30,7 @@ var Rotate = (function (_super) {
             if(!this.isListening && pFingerList.length >= 2) {
                 this._addListenedFingers(pFingerList[0], pFingerList[1]);
 
-                this._handler(_super.EVENT_TYPE.start, 0, this.listenedFingers);
+                this._handler(_super.EVENT_TYPE.start, this.data, this.listenedFingers);
                 this._lastAngle = this._getFingersAngle();
                 this._startAngle = this._lastAngle;
             }
@@ -47,7 +47,7 @@ var Rotate = (function (_super) {
 
         _onFingerRemoved: function(pFinger) {
             if(this.isListenedFinger(pFinger)) {
-                this._handler(_super.EVENT_TYPE.end, 0, this.listenedFingers);
+                this._handler(_super.EVENT_TYPE.end, this.data, this.listenedFingers);
 
                 this._removeAllListenedFingers();
             }

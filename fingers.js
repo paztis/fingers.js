@@ -37,6 +37,11 @@ var Utils = {
         RIGHT: 'right'
     },
 
+    GROW: {
+        IN: 'in',
+        OUT: 'out'
+    },
+
     getVelocity: function(deltaTime, deltaPos) {
         return Math.abs(deltaPos / deltaTime) || 0;
     },
@@ -738,43 +743,46 @@ Fingers.gesture.Drag = Drag;
 
 var Pinch = (function (_super) {
 
+    var DEFAULT_OPTIONS = {
+        nbFingers: 1,
+        pinchInDetect: 0.6,
+        pinchOutDetect: 1.4
+    };
+
     function Pinch(pOptions, pHandler) {
-        _super.call(this, pOptions, pHandler);
+        _super.call(this, pOptions, pHandler, DEFAULT_OPTIONS);
 
         this.data = {
-            totalScale: 1,
-            deltaScale: 1
+            grow: null,
+            scale: 1
         }
     }
 
     Fingers.__extend(Pinch.prototype, _super.prototype, {
 
         _startDistance: 0,
-        _lastDistance: 0,
         data: null,
 
         _onFingerAdded: function(pNewFinger, pFingerList) {
             if(!this.isListening && pFingerList.length >= 2) {
                 this._addListenedFingers(pFingerList[0], pFingerList[1]);
 
-                this._handler(_super.EVENT_TYPE.start, 1, this.listenedFingers);
-                this._lastDistance = this._getFingersDistance();
-                this._startDistance = this._lastDistance;
+                this._startDistance = this._getFingersDistance();
             }
         },
 
-        _onFingerUpdate: function(pFinger) {
-            var newDistance = this._getFingersDistance();
-            this.data.totalScale = newDistance / this._startDistance;
-            this.data.deltaScale = newDistance / this._lastDistance;
-            this._lastDistance = newDistance;
-
-            this._handler(_super.EVENT_TYPE.move, this.data, this.listenedFingers);
-        },
+        _onFingerUpdate: function(pFinger) {},
 
         _onFingerRemoved: function(pFinger) {
             if(this.isListenedFinger(pFinger)) {
-                this._handler(_super.EVENT_TYPE.end, 1, this.listenedFingers);
+                var newDistance = this._getFingersDistance();
+                var scale = newDistance / this._startDistance;
+
+                if(scale <= this.options.pinchInDetect || scale >= this.options.pinchOutDetect) {
+                    this.data.grow = (scale > 1) ? Utils.GROW.OUT : Utils.GROW.IN;
+                    this.data.scale = scale;
+                    this._handler(_super.EVENT_TYPE.end, this.data, this.listenedFingers);
+                }
 
                 this._removeAllListenedFingers();
             }
@@ -870,7 +878,7 @@ var Rotate = (function (_super) {
             if(!this.isListening && pFingerList.length >= 2) {
                 this._addListenedFingers(pFingerList[0], pFingerList[1]);
 
-                this._handler(_super.EVENT_TYPE.start, 0, this.listenedFingers);
+                this._handler(_super.EVENT_TYPE.start, this.data, this.listenedFingers);
                 this._lastAngle = this._getFingersAngle();
                 this._startAngle = this._lastAngle;
             }
@@ -887,7 +895,7 @@ var Rotate = (function (_super) {
 
         _onFingerRemoved: function(pFinger) {
             if(this.isListenedFinger(pFinger)) {
-                this._handler(_super.EVENT_TYPE.end, 0, this.listenedFingers);
+                this._handler(_super.EVENT_TYPE.end, this.data, this.listenedFingers);
 
                 this._removeAllListenedFingers();
             }
@@ -904,6 +912,73 @@ var Rotate = (function (_super) {
 })(Fingers.Gesture);
 
 Fingers.gesture.Rotate = Rotate;
+
+/**
+ * @module gestures
+ *
+ * @class Pinch
+ * @constructor
+ * @param {Object} pOptions
+ * @param {Function} pHandler
+ * @return {Pinch}
+ */
+
+
+var Scale = (function (_super) {
+
+    function Scale(pOptions, pHandler) {
+        _super.call(this, pOptions, pHandler);
+
+        this.data = {
+            totalScale: 1,
+            deltaScale: 1
+        }
+    }
+
+    Fingers.__extend(Scale.prototype, _super.prototype, {
+
+        _startDistance: 0,
+        _lastDistance: 0,
+        data: null,
+
+        _onFingerAdded: function(pNewFinger, pFingerList) {
+            if(!this.isListening && pFingerList.length >= 2) {
+                this._addListenedFingers(pFingerList[0], pFingerList[1]);
+
+                this._handler(_super.EVENT_TYPE.start, this.data, this.listenedFingers);
+                this._lastDistance = this._getFingersDistance();
+                this._startDistance = this._lastDistance;
+            }
+        },
+
+        _onFingerUpdate: function(pFinger) {
+            var newDistance = this._getFingersDistance();
+            this.data.totalScale = newDistance / this._startDistance;
+            this.data.deltaScale = newDistance / this._lastDistance;
+            this._lastDistance = newDistance;
+
+            this._handler(_super.EVENT_TYPE.move, this.data, this.listenedFingers);
+        },
+
+        _onFingerRemoved: function(pFinger) {
+            if(this.isListenedFinger(pFinger)) {
+                this._handler(_super.EVENT_TYPE.end, this.data, this.listenedFingers);
+
+                this._removeAllListenedFingers();
+            }
+        },
+
+        _getFingersDistance: function() {
+            var finger1P = this.listenedFingers[0].currentP;
+            var finger2P = this.listenedFingers[1].currentP;
+            return Fingers.Utils.getDistance(finger2P.x - finger1P.x, finger2P.y - finger1P.y);
+        }
+    });
+
+    return Scale;
+})(Fingers.Gesture);
+
+Fingers.gesture.Scale = Scale;
 
 /**
  * @module gestures
@@ -964,12 +1039,9 @@ var Swipe = (function (_super) {
                     velocityX += this.listenedFingers[i].getVelocityX();
                     velocityY += this.listenedFingers[i].getVelocityY();
                 }
-//                velocityX /= size;
-//                velocityY /= size;
+                velocityX /= size;
+                velocityY /= size;
 
-                console.log(isSameDirection)
-                console.log(velocityX+" "+this.options.swipeVelocityX)
-                console.log(velocityY+" "+this.options.swipeVelocityY)
                 if(isSameDirection &&
                     (velocityX > this.options.swipeVelocityX || pFinger.getVelocityY() > this.options.swipeVelocityY)) {
                     this.data.direction = direction;
@@ -1024,7 +1096,7 @@ var Transform = (function (_super) {
             if(!this.isListening && pFingerList.length >= 2) {
                 this._addListenedFingers(pFingerList[0], pFingerList[1]);
 
-                this._handler(_super.EVENT_TYPE.start, 0, this.listenedFingers);
+                this._handler(_super.EVENT_TYPE.start, this.data, this.listenedFingers);
                 this._lastAngle = this._getFingersAngle();
                 this._startAngle = this._lastAngle;
 
@@ -1049,7 +1121,7 @@ var Transform = (function (_super) {
 
         _onFingerRemoved: function(pFinger) {
             if(this.isListenedFinger(pFinger)) {
-                this._handler(_super.EVENT_TYPE.end, 0, this.listenedFingers);
+                this._handler(_super.EVENT_TYPE.end, this.data, this.listenedFingers);
 
                 this._removeAllListenedFingers();
             }

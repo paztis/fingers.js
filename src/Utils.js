@@ -13,6 +13,11 @@ var Utils = {
         RIGHT: 'right'
     },
 
+    GROW: {
+        IN: 'in',
+        OUT: 'out'
+    },
+
     getVelocity: function(deltaTime, deltaPos) {
         return Math.abs(deltaPos / deltaTime) || 0;
     },

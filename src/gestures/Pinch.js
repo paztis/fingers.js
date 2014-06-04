@@ -11,43 +11,46 @@
 
 var Pinch = (function (_super) {
 
+    var DEFAULT_OPTIONS = {
+        nbFingers: 1,
+        pinchInDetect: 0.6,
+        pinchOutDetect: 1.4
+    };
+
     function Pinch(pOptions, pHandler) {
-        _super.call(this, pOptions, pHandler);
+        _super.call(this, pOptions, pHandler, DEFAULT_OPTIONS);
 
         this.data = {
-            totalScale: 1,
-            deltaScale: 1
+            grow: null,
+            scale: 1
         }
     }
 
     Fingers.__extend(Pinch.prototype, _super.prototype, {
 
         _startDistance: 0,
-        _lastDistance: 0,
         data: null,
 
         _onFingerAdded: function(pNewFinger, pFingerList) {
             if(!this.isListening && pFingerList.length >= 2) {
                 this._addListenedFingers(pFingerList[0], pFingerList[1]);
 
-                this._handler(_super.EVENT_TYPE.start, 1, this.listenedFingers);
-                this._lastDistance = this._getFingersDistance();
-                this._startDistance = this._lastDistance;
+                this._startDistance = this._getFingersDistance();
             }
         },
 
-        _onFingerUpdate: function(pFinger) {
-            var newDistance = this._getFingersDistance();
-            this.data.totalScale = newDistance / this._startDistance;
-            this.data.deltaScale = newDistance / this._lastDistance;
-            this._lastDistance = newDistance;
-
-            this._handler(_super.EVENT_TYPE.move, this.data, this.listenedFingers);
-        },
+        _onFingerUpdate: function(pFinger) {},
 
         _onFingerRemoved: function(pFinger) {
             if(this.isListenedFinger(pFinger)) {
-                this._handler(_super.EVENT_TYPE.end, 1, this.listenedFingers);
+                var newDistance = this._getFingersDistance();
+                var scale = newDistance / this._startDistance;
+
+                if(scale <= this.options.pinchInDetect || scale >= this.options.pinchOutDetect) {
+                    this.data.grow = (scale > 1) ? Utils.GROW.OUT : Utils.GROW.IN;
+                    this.data.scale = scale;
+                    this._handler(_super.EVENT_TYPE.end, this.data, this.listenedFingers);
+                }
 
                 this._removeAllListenedFingers();
             }
