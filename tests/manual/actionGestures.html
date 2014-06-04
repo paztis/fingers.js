@@ -40,6 +40,8 @@
     <div id="testPinch1" class="testBox"><div class="innerLabel">Pinch Me</div></div>
     <div id="testHold1" class="testBox"><div class="innerLabel">Hold Me<br/>with 1 finger</div></div>
     <div id="testHold2" class="testBox"><div class="innerLabel">Hold Me<br/>with 2 finger</div></div>
+    <div id="testTap1" class="testBox"><div class="innerLabel">Tap me many times<br/>with 1 finger</div></div>
+    <div id="testTap2" class="testBox"><div class="innerLabel">Tap me many times<br/>with 2 finger</div></div>
     <script>
 
 
@@ -57,7 +59,7 @@
 
             var finger = new Fingers(pElement);
             finger.listenGesture(Fingers.gesture.Pinch, null, function(pEventType, pData, pFingers) {
-                updateLabel(pLabelElement,"Pinch " + pData.grow + "<br/>Scale: "+ pData.scale.toFixed(2));
+                updateLabel(pLabelElement, "Pinch " + pData.grow + "<br/>Scale: "+ pData.scale.toFixed(2));
             });
         };
 
@@ -67,7 +69,17 @@
             finger.listenGesture(Fingers.gesture.Hold, {
                 nbFingers: pNbFingers
             }, function(pEventType, pData, pFingers) {
-                updateLabel(pLabelElement,"Hold");
+                updateLabel(pLabelElement, "Hold");
+            });
+        };
+
+        function listenTap(pElement, pLabelElement, pNbFingers) {
+
+            var finger = new Fingers(pElement);
+            finger.listenGesture(Fingers.gesture.Tap, {
+                nbFingers: pNbFingers
+            }, function(pEventType, pNbTap, pFingers) {
+                updateLabel(pLabelElement, "Tap<br/>" + pNbTap + "x");
             });
         };
 
@@ -102,6 +114,12 @@
 
         boxE = document.getElementById("testHold2");
         listenHold(boxE, boxE.querySelector(".innerLabel"), 2);
+
+        boxE = document.getElementById("testTap1");
+        listenTap(boxE, boxE.querySelector(".innerLabel"), 1);
+
+        boxE = document.getElementById("testTap2");
+        listenTap(boxE, boxE.querySelector(".innerLabel"), 2);
     </script>
 </body>
 </html>
