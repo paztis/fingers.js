@@ -22,17 +22,17 @@ var Drag = (function (_super) {
             if(!this.isListening) {
                 this._addListenedFinger(pNewFinger);
 
-                this._handler(_super.EVENT_TYPE.start, this.listenedFingers[0]);
+                this.fire(_super.EVENT_TYPE.start, null);
             }
         },
 
         _onFingerUpdate: function(pFinger) {
-            this._handler(_super.EVENT_TYPE.move, this.listenedFingers[0]);
+            this.fire(_super.EVENT_TYPE.move, null);
         },
 
         _onFingerRemoved: function(pFinger) {
             if(this.isListenedFinger(pFinger)) {
-                this._handler(_super.EVENT_TYPE.end, this.listenedFingers[0]);
+                this.fire(_super.EVENT_TYPE.end, null);
 
                 this._removeAllListenedFingers();
             }

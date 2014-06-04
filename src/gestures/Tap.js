@@ -19,17 +19,20 @@ var Tap = (function (_super) {
 
     function Tap(pOptions, pHandler) {
         _super.call(this, pOptions, pHandler, DEFAULT_OPTIONS);
+        this.data = {
+            nbTap: 0,
+            lastTapTimestamp: 0
+        };
     }
 
     Fingers.__extend(Tap.prototype, _super.prototype, {
 
-        lastTapTimestamp: 0,
-        nbTap: 0,
+        data: null,
 
         _onFingerAdded: function(pNewFinger, pFingerList) {
             if(!this.isListening && pFingerList.length >= this.options.nbFingers) {
 
-                if((pNewFinger.getTime() - this.lastTapTimestamp) > this.options.tapInterval) {
+                if((pNewFinger.getTime() - this.data.lastTapTimestamp) > this.options.tapInterval) {
                     this._clearTap();
                 }
 
@@ -47,17 +50,17 @@ var Tap = (function (_super) {
                 this._removeAllListenedFingers();
 
                 if(pFinger.getTotalTime() < this.options.tapInterval) {
-                    this.lastTapTimestamp = pFinger.getTime();
-                    this.nbTap++;
+                    this.data.lastTapTimestamp = pFinger.getTime();
+                    this.data.nbTap++;
 
-                    this._handler(_super.EVENT_TYPE.instant, this.nbTap, this.listenedFingers);
+                    this.fire(_super.EVENT_TYPE.instant, this.data);
                 }
             }
         },
 
         _clearTap: function() {
-            this.lastTapTimestamp = 0;
-            this.nbTap = 0;
+            this.data.lastTapTimestamp = 0;
+            this.data.nbTap = 0;
         }
 
     });

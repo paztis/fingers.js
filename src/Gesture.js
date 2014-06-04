@@ -31,6 +31,11 @@ Gesture.prototype = {
     isListening: false,
     listenedFingers: null,
 
+    /*---- Handlers ----*/
+    fire: function(pType, pData) {
+        this._handler(pType, pData, this.listenedFingers);
+    },
+
     /*---- Fingers events ----*/
     _onFingerAdded: function(pNewFinger, pFingerList) { /*To Override*/ },
 

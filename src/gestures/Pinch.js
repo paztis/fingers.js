@@ -49,7 +49,7 @@ var Pinch = (function (_super) {
                 if(scale <= this.options.pinchInDetect || scale >= this.options.pinchOutDetect) {
                     this.data.grow = (scale > 1) ? Utils.GROW.OUT : Utils.GROW.IN;
                     this.data.scale = scale;
-                    this._handler(_super.EVENT_TYPE.instant, this.data, this.listenedFingers);
+                    this.fire(_super.EVENT_TYPE.instant, this.data);
                 }
 
                 this._removeAllListenedFingers();

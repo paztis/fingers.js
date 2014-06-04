@@ -30,7 +30,7 @@ var Rotate = (function (_super) {
             if(!this.isListening && pFingerList.length >= 2) {
                 this._addListenedFingers(pFingerList[0], pFingerList[1]);
 
-                this._handler(_super.EVENT_TYPE.start, this.data, this.listenedFingers);
+                this.fire(_super.EVENT_TYPE.start, this.data);
                 this._lastAngle = this._getFingersAngle();
                 this._startAngle = this._lastAngle;
             }
@@ -42,12 +42,12 @@ var Rotate = (function (_super) {
             this.data.deltaRotation = this._lastAngle - newAngle;
             this._lastAngle = newAngle;
 
-            this._handler(_super.EVENT_TYPE.move, this.data, this.listenedFingers);
+            this.fire(_super.EVENT_TYPE.move, this.data);
         },
 
         _onFingerRemoved: function(pFinger) {
             if(this.isListenedFinger(pFinger)) {
-                this._handler(_super.EVENT_TYPE.end, this.data, this.listenedFingers);
+                this.fire(_super.EVENT_TYPE.end, this.data);
 
                 this._removeAllListenedFingers();
             }

@@ -65,7 +65,7 @@ var Swipe = (function (_super) {
                     this.data.direction = direction;
                     this.data.velocity = (velocityX > this.options.swipeVelocityX) ? velocityX : velocityY;
 
-                    this._handler(_super.EVENT_TYPE.instant, this.data, this.listenedFingers);
+                    this.fire(_super.EVENT_TYPE.instant, this.data);
                 }
 
                 this._removeAllListenedFingers();

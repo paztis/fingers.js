@@ -78,8 +78,8 @@
             var finger = new Fingers(pElement);
             finger.addGesture(Fingers.gesture.Tap, {
                 nbFingers: pNbFingers
-            }, function(pEventType, pNbTap, pFingers) {
-                updateLabel(pLabelElement, "Tap<br/>" + pNbTap + "x");
+            }, function(pEventType, pData, pFingers) {
+                updateLabel(pLabelElement, "Tap<br/>" + pData.nbTap + "x");
             });
         };
 

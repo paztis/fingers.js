@@ -22,17 +22,17 @@ var Raw = (function (_super) {
 //            if(!this.isListening) {
                 this._addListenedFinger(pNewFinger);
 
-                this._handler(_super.EVENT_TYPE.start, pNewFinger);
+                this.fire(_super.EVENT_TYPE.start, pNewFinger);
 //            }
         },
 
         _onFingerUpdate: function(pFinger) {
-            this._handler(_super.EVENT_TYPE.move, pFinger);
+            this.fire(_super.EVENT_TYPE.move, pFinger);
         },
 
         _onFingerRemoved: function(pFinger) {
             if(this.isListenedFinger(pFinger)) {
-                this._handler(_super.EVENT_TYPE.end, pFinger);
+                this.fire(_super.EVENT_TYPE.end, pFinger);
 
                 this._removeAllListenedFingers();
             }

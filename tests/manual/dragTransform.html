@@ -47,10 +47,10 @@
         function listen(pBoxO) {
 
             var finger = new Fingers(pBoxO.element);
-            finger.addGesture(Fingers.gesture.Drag, null, function(pEventType, pFinger) {
+            finger.addGesture(Fingers.gesture.Drag, null, function(pEventType, pData, pFingers) {
                 if(pEventType === Fingers.Gesture.EVENT_TYPE.move) {
-                    pBoxO.x += pFinger.getDeltaX();
-                    pBoxO.y += pFinger.getDeltaY();
+                    pBoxO.x += pFingers[0].getDeltaX();
+                    pBoxO.y += pFingers[0].getDeltaY();
                     pBoxO.isUpdated = true;
                 }
                 else if(pEventType === Fingers.Gesture.EVENT_TYPE.start) {

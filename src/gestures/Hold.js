@@ -56,7 +56,7 @@ var Hold = (function (_super) {
 
         _onHoldTimeLeftF: null,
         _onHoldTimeLeft: function() {
-            this._handler(_super.EVENT_TYPE.instant, this.listenedFingers);
+            this.fire(_super.EVENT_TYPE.instant, null);
         },
 
         _onHoldCancel: function() {

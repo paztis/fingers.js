@@ -636,6 +636,11 @@ Gesture.prototype = {
     isListening: false,
     listenedFingers: null,
 
+    /*---- Handlers ----*/
+    fire: function(pType, pData) {
+        this._handler(pType, pData, this.listenedFingers);
+    },
+
     /*---- Fingers events ----*/
     _onFingerAdded: function(pNewFinger, pFingerList) { /*To Override*/ },
 
@@ -727,17 +732,17 @@ var Drag = (function (_super) {
             if(!this.isListening) {
                 this._addListenedFinger(pNewFinger);
 
-                this._handler(_super.EVENT_TYPE.start, this.listenedFingers[0]);
+                this.fire(_super.EVENT_TYPE.start, null);
             }
         },
 
         _onFingerUpdate: function(pFinger) {
-            this._handler(_super.EVENT_TYPE.move, this.listenedFingers[0]);
+            this.fire(_super.EVENT_TYPE.move, null);
         },
 
         _onFingerRemoved: function(pFinger) {
             if(this.isListenedFinger(pFinger)) {
-                this._handler(_super.EVENT_TYPE.end, this.listenedFingers[0]);
+                this.fire(_super.EVENT_TYPE.end, null);
 
                 this._removeAllListenedFingers();
             }
@@ -807,7 +812,7 @@ var Hold = (function (_super) {
 
         _onHoldTimeLeftF: null,
         _onHoldTimeLeft: function() {
-            this._handler(_super.EVENT_TYPE.instant, this.listenedFingers);
+            this.fire(_super.EVENT_TYPE.instant, null);
         },
 
         _onHoldCancel: function() {
@@ -872,7 +877,7 @@ var Pinch = (function (_super) {
                 if(scale <= this.options.pinchInDetect || scale >= this.options.pinchOutDetect) {
                     this.data.grow = (scale > 1) ? Utils.GROW.OUT : Utils.GROW.IN;
                     this.data.scale = scale;
-                    this._handler(_super.EVENT_TYPE.instant, this.data, this.listenedFingers);
+                    this.fire(_super.EVENT_TYPE.instant, this.data);
                 }
 
                 this._removeAllListenedFingers();
@@ -915,17 +920,17 @@ var Raw = (function (_super) {
 //            if(!this.isListening) {
                 this._addListenedFinger(pNewFinger);
 
-                this._handler(_super.EVENT_TYPE.start, pNewFinger);
+                this.fire(_super.EVENT_TYPE.start, pNewFinger);
 //            }
         },
 
         _onFingerUpdate: function(pFinger) {
-            this._handler(_super.EVENT_TYPE.move, pFinger);
+            this.fire(_super.EVENT_TYPE.move, pFinger);
         },
 
         _onFingerRemoved: function(pFinger) {
             if(this.isListenedFinger(pFinger)) {
-                this._handler(_super.EVENT_TYPE.end, pFinger);
+                this.fire(_super.EVENT_TYPE.end, pFinger);
 
                 this._removeAllListenedFingers();
             }
@@ -969,7 +974,7 @@ var Rotate = (function (_super) {
             if(!this.isListening && pFingerList.length >= 2) {
                 this._addListenedFingers(pFingerList[0], pFingerList[1]);
 
-                this._handler(_super.EVENT_TYPE.start, this.data, this.listenedFingers);
+                this.fire(_super.EVENT_TYPE.start, this.data);
                 this._lastAngle = this._getFingersAngle();
                 this._startAngle = this._lastAngle;
             }
@@ -981,12 +986,12 @@ var Rotate = (function (_super) {
             this.data.deltaRotation = this._lastAngle - newAngle;
             this._lastAngle = newAngle;
 
-            this._handler(_super.EVENT_TYPE.move, this.data, this.listenedFingers);
+            this.fire(_super.EVENT_TYPE.move, this.data);
         },
 
         _onFingerRemoved: function(pFinger) {
             if(this.isListenedFinger(pFinger)) {
-                this._handler(_super.EVENT_TYPE.end, this.data, this.listenedFingers);
+                this.fire(_super.EVENT_TYPE.end, this.data);
 
                 this._removeAllListenedFingers();
             }
@@ -1036,7 +1041,7 @@ var Scale = (function (_super) {
             if(!this.isListening && pFingerList.length >= 2) {
                 this._addListenedFingers(pFingerList[0], pFingerList[1]);
 
-                this._handler(_super.EVENT_TYPE.start, this.data, this.listenedFingers);
+                this.fire(_super.EVENT_TYPE.start, this.data);
                 this._lastDistance = this._getFingersDistance();
                 this._startDistance = this._lastDistance;
             }
@@ -1048,12 +1053,12 @@ var Scale = (function (_super) {
             this.data.deltaScale = newDistance / this._lastDistance;
             this._lastDistance = newDistance;
 
-            this._handler(_super.EVENT_TYPE.move, this.data, this.listenedFingers);
+            this.fire(_super.EVENT_TYPE.move, this.data);
         },
 
         _onFingerRemoved: function(pFinger) {
             if(this.isListenedFinger(pFinger)) {
-                this._handler(_super.EVENT_TYPE.end, this.data, this.listenedFingers);
+                this.fire(_super.EVENT_TYPE.end, this.data);
 
                 this._removeAllListenedFingers();
             }
@@ -1138,7 +1143,7 @@ var Swipe = (function (_super) {
                     this.data.direction = direction;
                     this.data.velocity = (velocityX > this.options.swipeVelocityX) ? velocityX : velocityY;
 
-                    this._handler(_super.EVENT_TYPE.instant, this.data, this.listenedFingers);
+                    this.fire(_super.EVENT_TYPE.instant, this.data);
                 }
 
                 this._removeAllListenedFingers();
@@ -1172,17 +1177,20 @@ var Tap = (function (_super) {
 
     function Tap(pOptions, pHandler) {
         _super.call(this, pOptions, pHandler, DEFAULT_OPTIONS);
+        this.data = {
+            nbTap: 0,
+            lastTapTimestamp: 0
+        };
     }
 
     Fingers.__extend(Tap.prototype, _super.prototype, {
 
-        lastTapTimestamp: 0,
-        nbTap: 0,
+        data: null,
 
         _onFingerAdded: function(pNewFinger, pFingerList) {
             if(!this.isListening && pFingerList.length >= this.options.nbFingers) {
 
-                if((pNewFinger.getTime() - this.lastTapTimestamp) > this.options.tapInterval) {
+                if((pNewFinger.getTime() - this.data.lastTapTimestamp) > this.options.tapInterval) {
                     this._clearTap();
                 }
 
@@ -1200,17 +1208,17 @@ var Tap = (function (_super) {
                 this._removeAllListenedFingers();
 
                 if(pFinger.getTotalTime() < this.options.tapInterval) {
-                    this.lastTapTimestamp = pFinger.getTime();
-                    this.nbTap++;
+                    this.data.lastTapTimestamp = pFinger.getTime();
+                    this.data.nbTap++;
 
-                    this._handler(_super.EVENT_TYPE.instant, this.nbTap, this.listenedFingers);
+                    this.fire(_super.EVENT_TYPE.instant, this.data);
                 }
             }
         },
 
         _clearTap: function() {
-            this.lastTapTimestamp = 0;
-            this.nbTap = 0;
+            this.data.lastTapTimestamp = 0;
+            this.data.nbTap = 0;
         }
 
     });
@@ -1256,12 +1264,13 @@ var Transform = (function (_super) {
             if(!this.isListening && pFingerList.length >= 2) {
                 this._addListenedFingers(pFingerList[0], pFingerList[1]);
 
-                this._handler(_super.EVENT_TYPE.start, this.data, this.listenedFingers);
                 this._lastAngle = this._getFingersAngle();
                 this._startAngle = this._lastAngle;
 
                 this._lastDistance = this._getFingersDistance();
                 this._startDistance = this._lastDistance;
+
+                this.fire(_super.EVENT_TYPE.start, this.data);
             }
         },
 
@@ -1276,12 +1285,12 @@ var Transform = (function (_super) {
             this.data.deltaScale = newDistance / this._lastDistance;
             this._lastDistance = newDistance;
 
-            this._handler(_super.EVENT_TYPE.move, this.data, this.listenedFingers);
+            this.fire(_super.EVENT_TYPE.move, this.data);
         },
 
         _onFingerRemoved: function(pFinger) {
             if(this.isListenedFinger(pFinger)) {
-                this._handler(_super.EVENT_TYPE.end, this.data, this.listenedFingers);
+                this.fire(_super.EVENT_TYPE.end, this.data);
 
                 this._removeAllListenedFingers();
             }
