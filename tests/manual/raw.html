@@ -58,7 +58,7 @@
         function listen(pElement, pContext) {
 
             var finger = new Fingers(pElement);
-            finger.addGesture(Fingers.gesture.Raw, null, function(pEventType, pFinger) {
+            finger.addGesture(Fingers.gesture.Raw, null).addHandler(function(pEventType, pFinger) {
                 if(pEventType === Fingers.Gesture.EVENT_TYPE.move) {
                     moveLine(pContext, pFinger);
                 }

@@ -11,8 +11,8 @@
 
 var Drag = (function (_super) {
 
-    function Drag(pOptions, pHandler) {
-        _super.call(this, pOptions, pHandler);
+    function Drag(pOptions) {
+        _super.call(this, pOptions);
     }
 
 

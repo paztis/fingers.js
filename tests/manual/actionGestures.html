@@ -50,7 +50,7 @@
             var finger = new Fingers(pElement);
             finger.addGesture(Fingers.gesture.Swipe, {
                 nbFingers: pNbFingers
-            }, function(pEventType, pData, pFingers) {
+            }).addHandler(function(pEventType, pData, pFingers) {
                 updateLabel(pLabelElement, "Swipe " + pData.direction + "<br/>Velocity: "+ pData.velocity.toFixed(2) + " px/ms");
             });
         }
@@ -58,7 +58,7 @@
         function listenPinch(pElement, pLabelElement) {
 
             var finger = new Fingers(pElement);
-            finger.addGesture(Fingers.gesture.Pinch, null, function(pEventType, pData, pFingers) {
+            finger.addGesture(Fingers.gesture.Pinch, null).addHandler(function(pEventType, pData, pFingers) {
                 updateLabel(pLabelElement, "Pinch " + pData.grow + "<br/>Scale: "+ pData.scale.toFixed(2));
             });
         };
@@ -68,7 +68,7 @@
             var finger = new Fingers(pElement);
             finger.addGesture(Fingers.gesture.Hold, {
                 nbFingers: pNbFingers
-            }, function(pEventType, pData, pFingers) {
+            }).addHandler(function(pEventType, pData, pFingers) {
                 updateLabel(pLabelElement, "Hold");
             });
         };
@@ -78,7 +78,7 @@
             var finger = new Fingers(pElement);
             finger.addGesture(Fingers.gesture.Tap, {
                 nbFingers: pNbFingers
-            }, function(pEventType, pData, pFingers) {
+            }).addHandler(function(pEventType, pData, pFingers) {
                 updateLabel(pLabelElement, "Tap<br/>" + pData.nbTap + "x");
             });
         };

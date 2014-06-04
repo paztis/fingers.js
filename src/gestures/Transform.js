@@ -11,8 +11,8 @@
 
 var Transform = (function (_super) {
 
-    function Transform(pOptions, pHandler) {
-        _super.call(this, pOptions, pHandler);
+    function Transform(pOptions) {
+        _super.call(this, pOptions);
 
         this.data = {
             totalRotation: 0,

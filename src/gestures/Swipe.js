@@ -18,8 +18,8 @@ var Swipe = (function (_super) {
         swipeVelocityY: 0.6
     };
 
-    function Swipe(pOptions, pHandler) {
-        _super.call(this, pOptions, pHandler, DEFAULT_OPTIONS);
+    function Swipe(pOptions) {
+        _super.call(this, pOptions, DEFAULT_OPTIONS);
 
         this.data = {
             direction: null,

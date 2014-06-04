@@ -11,8 +11,8 @@
 
 var Raw = (function (_super) {
 
-    function Raw(pOptions, pHandler) {
-        _super.call(this, pOptions, pHandler);
+    function Raw(pOptions) {
+        _super.call(this, pOptions);
     }
 
 

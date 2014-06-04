@@ -65,8 +65,8 @@ Instance.prototype = {
         return this.gestureList;
     },
 
-    addGesture: function(PGestureClass, pOptions, pHandler) {
-        var gesture = new PGestureClass(pOptions, pHandler);
+    addGesture: function(PGestureClass, pOptions) {
+        var gesture = new PGestureClass(pOptions);
         this.gestureList.push(gesture);
 
         return gesture;

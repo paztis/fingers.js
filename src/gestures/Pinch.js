@@ -17,8 +17,8 @@ var Pinch = (function (_super) {
         pinchOutDetect: 1.4
     };
 
-    function Pinch(pOptions, pHandler) {
-        _super.call(this, pOptions, pHandler, DEFAULT_OPTIONS);
+    function Pinch(pOptions) {
+        _super.call(this, pOptions, DEFAULT_OPTIONS);
 
         this.data = {
             grow: null,

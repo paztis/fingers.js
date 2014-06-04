@@ -11,8 +11,8 @@
 
 var Scale = (function (_super) {
 
-    function Scale(pOptions, pHandler) {
-        _super.call(this, pOptions, pHandler);
+    function Scale(pOptions) {
+        _super.call(this, pOptions);
 
         this.data = {
             totalScale: 1,

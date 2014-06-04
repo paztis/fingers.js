@@ -17,8 +17,8 @@ var Tap = (function (_super) {
         tapInterval: 400
     };
 
-    function Tap(pOptions, pHandler) {
-        _super.call(this, pOptions, pHandler, DEFAULT_OPTIONS);
+    function Tap(pOptions) {
+        _super.call(this, pOptions, DEFAULT_OPTIONS);
         this.data = {
             nbTap: 0,
             lastTapTimestamp: 0

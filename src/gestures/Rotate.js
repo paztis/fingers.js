@@ -11,8 +11,8 @@
 
 var Rotate = (function (_super) {
 
-    function Rotate(pOptions, pHandler) {
-        _super.call(this, pOptions, pHandler);
+    function Rotate(pOptions) {
+        _super.call(this, pOptions);
 
         this.data = {
             totalRotation: 0,

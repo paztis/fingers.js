@@ -18,8 +18,8 @@ var Hold = (function (_super) {
         duration: 500
     };
 
-    function Hold(pOptions, pHandler) {
-        _super.call(this, pOptions, pHandler, DEFAULT_OPTIONS);
+    function Hold(pOptions) {
+        _super.call(this, pOptions, DEFAULT_OPTIONS);
         this._onHoldTimeLeftF = this._onHoldTimeLeft.bind(this);
     }
 

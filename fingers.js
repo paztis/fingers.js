@@ -187,8 +187,8 @@ Instance.prototype = {
         return this.gestureList;
     },
 
-    addGesture: function(PGestureClass, pOptions, pHandler) {
-        var gesture = new PGestureClass(pOptions, pHandler);
+    addGesture: function(PGestureClass, pOptions) {
+        var gesture = new PGestureClass(pOptions);
         this.gestureList.push(gesture);
 
         return gesture;
@@ -614,9 +614,9 @@ Fingers.Position = Position;
  * @return {Gesture}
  */
 
-var Gesture = function(pOptions, pHandler, pDefaultOptions) {
+var Gesture = function(pOptions, pDefaultOptions) {
     this.options = Fingers.__extend({}, pDefaultOptions || {}, pOptions || {});
-    this._handler = pHandler;
+    this._handlerList = [];
     this.listenedFingers = [];
     this._onFingerUpdateF = this._onFingerUpdate.bind(this);
 };
@@ -631,14 +631,32 @@ Gesture.EVENT_TYPE = {
 Gesture.prototype = {
 
     options: null,
-    _handler: null,
+    _handlerList: null,
+    _handlerListSize: 0,
 
     isListening: false,
     listenedFingers: null,
 
     /*---- Handlers ----*/
+    addHandler: function(pHandler) {
+        this._handlerList.push(pHandler);
+        this._handlerListSize++;
+
+        return this;
+    },
+
+    removeHandler: function(pHandler) {
+        var index = this._handlerList.indexOf(pHandler);
+        this._handlerList.splice(index, 1);
+        this._handlerListSize--;
+
+        return this;
+    },
+
     fire: function(pType, pData) {
-        this._handler(pType, pData, this.listenedFingers);
+        for(var i=0; i<this._handlerListSize; i++) {
+            this._handlerList[i](pType, pData, this.listenedFingers);
+        }
     },
 
     /*---- Fingers events ----*/
@@ -721,8 +739,8 @@ Fingers.gesture = {
 
 var Drag = (function (_super) {
 
-    function Drag(pOptions, pHandler) {
-        _super.call(this, pOptions, pHandler);
+    function Drag(pOptions) {
+        _super.call(this, pOptions);
     }
 
 
@@ -774,8 +792,8 @@ var Hold = (function (_super) {
         duration: 500
     };
 
-    function Hold(pOptions, pHandler) {
-        _super.call(this, pOptions, pHandler, DEFAULT_OPTIONS);
+    function Hold(pOptions) {
+        _super.call(this, pOptions, DEFAULT_OPTIONS);
         this._onHoldTimeLeftF = this._onHoldTimeLeft.bind(this);
     }
 
@@ -845,8 +863,8 @@ var Pinch = (function (_super) {
         pinchOutDetect: 1.4
     };
 
-    function Pinch(pOptions, pHandler) {
-        _super.call(this, pOptions, pHandler, DEFAULT_OPTIONS);
+    function Pinch(pOptions) {
+        _super.call(this, pOptions, DEFAULT_OPTIONS);
 
         this.data = {
             grow: null,
@@ -909,8 +927,8 @@ Fingers.gesture.Pinch = Pinch;
 
 var Raw = (function (_super) {
 
-    function Raw(pOptions, pHandler) {
-        _super.call(this, pOptions, pHandler);
+    function Raw(pOptions) {
+        _super.call(this, pOptions);
     }
 
 
@@ -955,8 +973,8 @@ Fingers.gesture.Raw = Raw;
 
 var Rotate = (function (_super) {
 
-    function Rotate(pOptions, pHandler) {
-        _super.call(this, pOptions, pHandler);
+    function Rotate(pOptions) {
+        _super.call(this, pOptions);
 
         this.data = {
             totalRotation: 0,
@@ -1022,8 +1040,8 @@ Fingers.gesture.Rotate = Rotate;
 
 var Scale = (function (_super) {
 
-    function Scale(pOptions, pHandler) {
-        _super.call(this, pOptions, pHandler);
+    function Scale(pOptions) {
+        _super.call(this, pOptions);
 
         this.data = {
             totalScale: 1,
@@ -1096,8 +1114,8 @@ var Swipe = (function (_super) {
         swipeVelocityY: 0.6
     };
 
-    function Swipe(pOptions, pHandler) {
-        _super.call(this, pOptions, pHandler, DEFAULT_OPTIONS);
+    function Swipe(pOptions) {
+        _super.call(this, pOptions, DEFAULT_OPTIONS);
 
         this.data = {
             direction: null,
@@ -1175,8 +1193,8 @@ var Tap = (function (_super) {
         tapInterval: 400
     };
 
-    function Tap(pOptions, pHandler) {
-        _super.call(this, pOptions, pHandler, DEFAULT_OPTIONS);
+    function Tap(pOptions) {
+        _super.call(this, pOptions, DEFAULT_OPTIONS);
         this.data = {
             nbTap: 0,
             lastTapTimestamp: 0
@@ -1241,8 +1259,8 @@ Fingers.gesture.Tap = Tap;
 
 var Transform = (function (_super) {
 
-    function Transform(pOptions, pHandler) {
-        _super.call(this, pOptions, pHandler);
+    function Transform(pOptions) {
+        _super.call(this, pOptions);
 
         this.data = {
             totalRotation: 0,

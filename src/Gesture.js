@@ -9,9 +9,9 @@
  * @return {Gesture}
  */
 
-var Gesture = function(pOptions, pHandler, pDefaultOptions) {
+var Gesture = function(pOptions, pDefaultOptions) {
     this.options = Fingers.__extend({}, pDefaultOptions || {}, pOptions || {});
-    this._handler = pHandler;
+    this._handlerList = [];
     this.listenedFingers = [];
     this._onFingerUpdateF = this._onFingerUpdate.bind(this);
 };
@@ -26,14 +26,32 @@ Gesture.EVENT_TYPE = {
 Gesture.prototype = {
 
     options: null,
-    _handler: null,
+    _handlerList: null,
+    _handlerListSize: 0,
 
     isListening: false,
     listenedFingers: null,
 
     /*---- Handlers ----*/
+    addHandler: function(pHandler) {
+        this._handlerList.push(pHandler);
+        this._handlerListSize++;
+
+        return this;
+    },
+
+    removeHandler: function(pHandler) {
+        var index = this._handlerList.indexOf(pHandler);
+        this._handlerList.splice(index, 1);
+        this._handlerListSize--;
+
+        return this;
+    },
+
     fire: function(pType, pData) {
-        this._handler(pType, pData, this.listenedFingers);
+        for(var i=0; i<this._handlerListSize; i++) {
+            this._handlerList[i](pType, pData, this.listenedFingers);
+        }
     },
 
     /*---- Fingers events ----*/
