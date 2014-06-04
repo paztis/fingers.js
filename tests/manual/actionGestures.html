@@ -12,7 +12,7 @@
     <META http-equiv="Pragma" content="no-cache">
     <META http-equiv="Expires" content="0">
 
-    <title>Basic Tests</title>
+    <title>Action gestures</title>
     <script src="../../fingers.js"></script>
     <style>
         .testBox {
@@ -38,6 +38,8 @@
     <div id="testSwipe3" class="testBox"><div class="innerLabel">Swipe Me<br/>with 3 fingers</div></div>
     <div id="testSwipe4" class="testBox"><div class="innerLabel">Swipe Me<br/>with 4 fingers</div></div>
     <div id="testPinch1" class="testBox"><div class="innerLabel">Pinch Me</div></div>
+    <div id="testHold1" class="testBox"><div class="innerLabel">Hold Me<br/>with 1 finger</div></div>
+    <div id="testHold2" class="testBox"><div class="innerLabel">Hold Me<br/>with 2 finger</div></div>
     <script>
 
 
@@ -56,6 +58,16 @@
             var finger = new Fingers(pElement);
             finger.listenGesture(Fingers.gesture.Pinch, null, function(pEventType, pData, pFingers) {
                 updateLabel(pLabelElement,"Pinch " + pData.grow + "<br/>Scale: "+ pData.scale.toFixed(2));
+            });
+        };
+
+        function listenHold(pElement, pLabelElement, pNbFingers) {
+
+            var finger = new Fingers(pElement);
+            finger.listenGesture(Fingers.gesture.Hold, {
+                nbFingers: pNbFingers
+            }, function(pEventType, pData, pFingers) {
+                updateLabel(pLabelElement,"Hold");
             });
         };
 
@@ -84,6 +96,12 @@
 
         boxE = document.getElementById("testPinch1");
         listenPinch(boxE, boxE.querySelector(".innerLabel"));
+
+        boxE = document.getElementById("testHold1");
+        listenHold(boxE, boxE.querySelector(".innerLabel"), 1);
+
+        boxE = document.getElementById("testHold2");
+        listenHold(boxE, boxE.querySelector(".innerLabel"), 2);
     </script>
 </body>
 </html>

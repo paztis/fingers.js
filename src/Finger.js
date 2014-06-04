@@ -38,7 +38,8 @@ Finger.cacheIndexes = {
 
     velocityX: CACHE_INDEX_CREATOR++,
     velocityY: CACHE_INDEX_CREATOR++,
-    velocity: CACHE_INDEX_CREATOR++
+    velocity: CACHE_INDEX_CREATOR++,
+    velocityAverage: CACHE_INDEX_CREATOR++
 };
 
 Finger.prototype = {
@@ -130,14 +131,14 @@ Finger.prototype = {
         return this._cacheArray.getCachedValueOrUpdate(Finger.cacheIndexes.totalX, this._getTotalX, this);
     },
     _getTotalX: function() {
-        return this.currentP.x - this.previousP.x;
+        return this.currentP.x - this.startP.x;
     },
 
     getTotalY: function() {
         return this._cacheArray.getCachedValueOrUpdate(Finger.cacheIndexes.totalY, this._getTotalY, this);
     },
     _getTotalY: function() {
-        return this.currentP.y - this.previousP.y;
+        return this.currentP.y - this.startP.y;
     },
 
     getDistance: function() {
@@ -182,6 +183,13 @@ Finger.prototype = {
     },
     _getVelocity: function() {
         return Utils.getVelocity(this.getDeltaTime(), this.getDeltaDistance());
+    },
+
+    getVelocityAverage: function() {
+        return this._cacheArray.getCachedValueOrUpdate(Finger.cacheIndexes.velocityAverage, this._getVelocity, this);
+    },
+    _getVelocityAverage: function() {
+        return Utils.getVelocity(this.getTotalTime(), this.getDistance());
     }
 };
 
