@@ -25,6 +25,7 @@ module.exports = function(grunt) {
                     'src/CacheArray.js',
                     'src/Instance.js',
                     'src/Finger.js',
+                    'src/FingerUtils.js',
                     'src/Gesture.js',
                     'src/gestures/module.js',
                     'src/gestures/Drag.js',

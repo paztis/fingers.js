@@ -1,4 +1,4 @@
-/*! Fingers.js - v0.0.1 - 2014-06-04
+/*! Fingers.js - v0.0.1 - 2014-06-05
  *
  * Copyright (c) 2014 Jérôme HENAFF <jerome.henaff@gmail.com>;
  * Licensed under the MIT license */
@@ -606,6 +606,28 @@ Fingers.Position = Position;
 /**
  * @module fingers
  *
+ * @class FingerUtils
+ */
+
+var FingerUtils = {
+
+    getFingersAngle: function(pFinger1, pFinger2) {
+        return Utils.getAngle(pFinger2.currentP.x - pFinger1.currentP.x, pFinger2.currentP.y - pFinger1.currentP.y);
+    },
+
+    getFingersDistance: function(pFinger1, pFinger2) {
+        return Utils.getDistance(pFinger2.currentP.x - pFinger1.currentP.x, pFinger2.currentP.y - pFinger1.currentP.y);
+    }
+};
+
+Fingers.FingerUtils = FingerUtils;
+
+
+
+
+/**
+ * @module fingers
+ *
  * @class Gesture
  * @constructor
  * @param {Object} pOptions
@@ -1191,15 +1213,11 @@ var Transform = (function (_super) {
         },
 
         _getFingersAngle: function() {
-            var finger1P = this.listenedFingers[0].currentP;
-            var finger2P = this.listenedFingers[1].currentP;
-            return Fingers.Utils.getAngle(finger2P.x - finger1P.x, finger2P.y - finger1P.y);
+            return Fingers.FingerUtils.getFingersAngle(this.listenedFingers[0], this.listenedFingers[1]);
         },
 
         _getFingersDistance: function() {
-            var finger1P = this.listenedFingers[0].currentP;
-            var finger2P = this.listenedFingers[1].currentP;
-            return Fingers.Utils.getDistance(finger2P.x - finger1P.x, finger2P.y - finger1P.y);
+            return Fingers.FingerUtils.getFingersDistance(this.listenedFingers[0], this.listenedFingers[1]);
         }
     });
 

@@ -84,15 +84,11 @@ var Transform = (function (_super) {
         },
 
         _getFingersAngle: function() {
-            var finger1P = this.listenedFingers[0].currentP;
-            var finger2P = this.listenedFingers[1].currentP;
-            return Fingers.Utils.getAngle(finger2P.x - finger1P.x, finger2P.y - finger1P.y);
+            return Fingers.FingerUtils.getFingersAngle(this.listenedFingers[0], this.listenedFingers[1]);
         },
 
         _getFingersDistance: function() {
-            var finger1P = this.listenedFingers[0].currentP;
-            var finger2P = this.listenedFingers[1].currentP;
-            return Fingers.Utils.getDistance(finger2P.x - finger1P.x, finger2P.y - finger1P.y);
+            return Fingers.FingerUtils.getFingersDistance(this.listenedFingers[0], this.listenedFingers[1]);
         }
     });
 
