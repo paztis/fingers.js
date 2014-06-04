@@ -11,9 +11,11 @@
  * @param {HTMLElement} pElement
  * @return {Instance}
  */
+
 var Instance = function(pElement) {
     this._init(pElement);
 };
+
 Instance.HAS_TOUCHEVENTS = ('ontouchstart' in window);
 Instance.IS_MOBILE = /mobile|tablet|ip(ad|hone|od)|android|silk/i.test(navigator.userAgent);
 Instance.LISTEN_TOUCH_EVENTS = (Instance.HAS_TOUCHEVENTS && Instance.IS_MOBILE);
@@ -134,7 +136,6 @@ Instance.prototype = {
 
     _onTouchMove: function(pTouchEvent) {
         var touch;
-        var finger;
         for(var i= 0, size=pTouchEvent.changedTouches.length; i<size; i++) {
             touch = pTouchEvent.changedTouches[i];
             this._updateFingerPosition(touch.identifier, pTouchEvent.timeStamp, touch.pageX, touch.pageY);

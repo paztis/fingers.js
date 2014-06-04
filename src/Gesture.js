@@ -5,6 +5,7 @@
  * @constructor
  * @param {Object} pOptions
  * @param {Function} pHandler
+ * @param {Object} pDefaultOptions
  * @return {Gesture}
  */
 
