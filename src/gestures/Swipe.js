@@ -46,23 +46,21 @@ var Swipe = (function (_super) {
 
                 var isSameDirection = true;
                 var direction = this.listenedFingers[0].getDirection();
-                var velocityX = 0;
-                var velocityY = 0;
+                var maxVelocityX = 0;
+                var maxVelocityY = 0;
 
                 var size = this.listenedFingers.length;
                 for(var i= 0; i<size; i++) {
                     isSameDirection = isSameDirection && (direction === this.listenedFingers[i].getDirection());
 
-                    velocityX += this.listenedFingers[i].getVelocityX();
-                    velocityY += this.listenedFingers[i].getVelocityY();
+                    maxVelocityX = Math.max(maxVelocityX, this.listenedFingers[i].getVelocityX());
+                    maxVelocityY = Math.max(maxVelocityY, this.listenedFingers[i].getVelocityY());
                 }
-                velocityX /= size;
-                velocityY /= size;
 
                 if(isSameDirection &&
-                    (velocityX > this.options.swipeVelocityX || pFinger.getVelocityY() > this.options.swipeVelocityY)) {
+                    (maxVelocityX > this.options.swipeVelocityX || maxVelocityY > this.options.swipeVelocityY)) {
                     this.data.direction = direction;
-                    this.data.velocity = (velocityX > this.options.swipeVelocityX) ? velocityX : velocityY;
+                    this.data.velocity = (maxVelocityX > this.options.swipeVelocityX) ? maxVelocityX : maxVelocityY;
 
                     this.fire(_super.EVENT_TYPE.instant, this.data);
                 }
