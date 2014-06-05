@@ -70,7 +70,7 @@
 
         function transform(pBoxO) {
             if(pBoxO.isUpdated) {
-                pBoxO.element.style.webkitTransform = "translateZ(0) " +
+                pBoxO.element.style[TRANSFORM_PREFIXED] = "translateZ(0) " +
                         "translate(" + pBoxO.x + "px, " + pBoxO.y + "px) " +
                         "scale(" + pBoxO.scale + ") " +
                         "rotate(" + pBoxO.rad + "rad) ";
@@ -82,6 +82,19 @@
         function generateHexColor() {
             return '#'+Math.random().toString(16).substr(-6);
         }
+
+        function getVendorPrefixed(pArrayOfPrefixes) {
+            var result = null;
+            for (var i=0; i<pArrayOfPrefixes.length; i++) {
+                if (document.body.style[pArrayOfPrefixes[i]] !== undefined) {
+                    result = pArrayOfPrefixes[i];
+                    break;
+                }
+            }
+
+            return result;
+        }
+
 
         function loop() {
             for(var i=0; i<boxListLength; i++) {
@@ -96,13 +109,16 @@
 
 
 
-
+        var TRANSFORM_PREFIXED;
         var boxList = [];
         var boxListLength = 0;
         var topZIndex = 0;
 
 
         this.onload = function() {
+
+            TRANSFORM_PREFIXED = getVendorPrefixed(["transform", "msTransform", "MozTransform", "webkitTransform", "OTransform"]);
+
             for(var i=0; i<10; i++) {
                 var boxO = createBox("box " + (i+1), generateHexColor());
                 boxList.push(boxO);
