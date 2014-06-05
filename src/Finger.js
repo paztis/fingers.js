@@ -67,13 +67,15 @@ Finger.prototype = {
     },
 
     _setCurrentP: function(pTimestamp, pX, pY) {
-        this._cacheArray.clearCache();
+        if(this.getX() != pX || this.getY() != pY) { //Prevent chrome multiple events for same position (radiusX, radiusY)
+            this._cacheArray.clearCache();
 
-        this.previousP.copy(this.currentP);
-        this.currentP.set(pTimestamp, pX, pY);
+            this.previousP.copy(this.currentP);
+            this.currentP.set(pTimestamp, pX, pY);
 
-        for(var i= 0; i<this._handlerListSize; i++) {
-            this._handlerList[i](this);
+            for(var i= 0; i<this._handlerListSize; i++) {
+                this._handlerList[i](this);
+            }
         }
     },
 
