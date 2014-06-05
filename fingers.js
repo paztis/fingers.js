@@ -1,4 +1,4 @@
-/*! Fingers.js - v0.0.1 - 2014-06-05
+/*! Fingers.js - v0.0.1 - 2014-06-06
  *
  * Copyright (c) 2014 Jérôme HENAFF <jerome.henaff@gmail.com>;
  * Licensed under the MIT license */
@@ -668,6 +668,14 @@ var FingerUtils = {
         center.y = Math.round(center.y / size);
 
         return center;
+    },
+
+    getElementRelativePosition: function(pElement, pFinger) {
+        var bounding = pElement.getBoundingClientRect();
+        return {
+            x: pFinger.currentP.x - bounding.left,
+            y: pFinger.currentP.y - bounding.top
+        };
     }
 };
 
