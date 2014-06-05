@@ -12,6 +12,7 @@
 
 var Finger = function(pId, pTimestamp, pX, pY) {
     this.id = pId;
+    this.state = Finger.STATE.ACTIVE;
     this._handlerList = [];
 
     this.startP = new Position(pTimestamp, pX, pY);
@@ -42,12 +43,22 @@ Finger.cacheIndexes = {
     velocityAverage: CACHE_INDEX_CREATOR++
 };
 
+Finger.STATE = {
+    ACTIVE: "active",
+    REMOVED: "removed"
+};
+
+Finger.CONSTANTS = {
+    inactivityTime: 100
+};
+
 Finger.prototype = {
     /**
      * @property id
      * @type {Number}
      */
     id: null,
+    state: null,
     startP: null,
     previousP: null,
     currentP: null,
@@ -66,8 +77,8 @@ Finger.prototype = {
         this._handlerListSize = this._handlerList.length;
     },
 
-    _setCurrentP: function(pTimestamp, pX, pY) {
-        if(this.getX() != pX || this.getY() != pY) { //Prevent chrome multiple events for same position (radiusX, radiusY)
+    _setCurrentP: function(pTimestamp, pX, pY, pForceSetter) {
+        if(this.getX() != pX || this.getY() != pY || pForceSetter) { //Prevent chrome multiple events for same position (radiusX, radiusY)
             this._cacheArray.clearCache();
 
             this.previousP.copy(this.currentP);
@@ -76,6 +87,14 @@ Finger.prototype = {
             for(var i= 0; i<this._handlerListSize; i++) {
                 this._handlerList[i](this);
             }
+        }
+    },
+
+    _setEndP: function(pTimestamp) {
+        //Only update if end event is not "instant" with move event
+        if((pTimestamp - this.getTime()) > Finger.CONSTANTS.inactivityTime) {
+            this._setCurrentP(pTimestamp, this.getX(), this.getY(), true);
+            this.state = Finger.STATE.REMOVED;
         }
     },
 
@@ -96,6 +115,11 @@ Finger.prototype = {
     },
     _getTotalTime: function() {
         return this.currentP.timestamp - this.startP.timestamp;
+    },
+
+    getInactivityTime: function() {
+        var delta = Date.now() - this.currentP.timestamp;
+        return (delta > Finger.CONSTANTS.inactivityTime) ? delta : 0;
     },
 
     /*---- position ----*/

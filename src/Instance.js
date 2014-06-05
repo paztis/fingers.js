@@ -118,7 +118,7 @@ Instance.prototype = {
     _stopListeningF: null,
     stopListening: function() {
         if(this._stopListeningF !== null) {
-            this._removeAllFingers();
+            this._removeAllFingers(Date.now());
 
             this._stopListeningF();
             this._stopListeningF = null;
@@ -146,7 +146,7 @@ Instance.prototype = {
 
     _onTouchEnd: function(pTouchEvent) {
         for(var i= 0, size=pTouchEvent.changedTouches.length; i<size; i++) {
-            this._removeFinger(pTouchEvent.changedTouches[i].identifier);
+            this._removeFinger(pTouchEvent.changedTouches[i].identifier, pTouchEvent.timeStamp);
         }
     },
 
@@ -156,7 +156,7 @@ Instance.prototype = {
 
             if(this.fingerMap[pTouchEvent.changedTouches[i].identifier] !== undefined) {
                 //Remove all fingers
-                this._removeAllFingers();
+                this._removeAllFingers(pTouchEvent.timeStamp);
                 break;
             }
         }
@@ -187,7 +187,7 @@ Instance.prototype = {
         document.removeEventListener("mousemove", this._onMouseMoveF);
         document.removeEventListener("mouseup", this._onMouseUpF);
 
-        this._removeFinger(0);
+        this._removeFinger(0, pMouseEvent.timeStamp);
     },
 
     /*---- Fingers ----*/
@@ -202,9 +202,11 @@ Instance.prototype = {
         }
     },
 
-    _removeFinger: function(pFingerId) {
+    _removeFinger: function(pFingerId, pTimestamp) {
         var finger = this.fingerMap[pFingerId];
         if(finger !== undefined) {
+            finger._setEndP(pTimestamp);
+
             for(var i=0, size=this.gestureList.length; i<size; i++) {
                 this.gestureList[i]._onFingerRemoved(finger);
             }
@@ -214,11 +216,11 @@ Instance.prototype = {
         }
     },
 
-    _removeAllFingers: function() {
+    _removeAllFingers: function(pTimestamp) {
         var list = this.fingerList.splice(0);
         for(var i= 0, size=list.length; i<size; i++) {
 
-            this._removeFinger(list[i].id);
+            this._removeFinger(list[i].id, pTimestamp);
         }
     },
 
