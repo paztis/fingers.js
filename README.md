@@ -73,5 +73,5 @@ It provides informations about:
 Informations are always available from Finger start or from Finger last move (ex: current velocity and average velocity)
 
 ## Examples
-Examples are available in [/tests/manual folder](/src/tests/manual).
+Examples are available in [/tests/manual folder](/tests/manual).
 Try if on PC (but only with on finger) or on a Smartphone / Tablet with all your fingers, then enjoy it.
