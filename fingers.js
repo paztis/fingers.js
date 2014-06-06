@@ -1,4 +1,4 @@
-/*! Fingers.js - v0.0.1 - 2014-06-05
+/*! Fingers.js - v0.0.1 - 2014-06-06
  *
  * Copyright (c) 2014 Jérôme HENAFF <jerome.henaff@gmail.com>;
  * Licensed under the MIT license */
@@ -927,7 +927,6 @@ Fingers.gesture.Hold = Hold;
 var Pinch = (function (_super) {
 
     var DEFAULT_OPTIONS = {
-        nbFingers: 1,
         pinchInDetect: 0.6,
         pinchOutDetect: 1.4
     };
