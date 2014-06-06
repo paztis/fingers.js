@@ -36,7 +36,12 @@ Each gesture has his set of options
         scale: true
     };
 
-#### Drag, Rotate, Scale, Raw
+#### Raw defaults
+    {
+        nbMaxFingers: Number.MAX_VALUE
+    };
+
+#### Drag, Rotate, Scale
 No options
 
 #### Example

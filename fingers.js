@@ -995,19 +995,23 @@ Fingers.gesture.Pinch = Pinch;
 
 var Raw = (function (_super) {
 
+    var DEFAULT_OPTIONS = {
+        nbMaxFingers: Number.MAX_VALUE
+    };
+
     function Raw(pOptions) {
-        _super.call(this, pOptions);
+        _super.call(this, pOptions, DEFAULT_OPTIONS);
     }
 
 
     Fingers.__extend(Raw.prototype, _super.prototype, {
 
         _onFingerAdded: function(pNewFinger, pFingerList) {
-//            if(!this.isListening) {
+            if(this.listenedFingers.length < this.options.nbMaxFingers) {
                 this._addListenedFinger(pNewFinger);
 
                 this.fire(_super.EVENT_TYPE.start, pNewFinger);
-//            }
+            }
         },
 
         _onFingerUpdate: function(pFinger) {
