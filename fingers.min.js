@@ -1,4 +1,5 @@
-/*! Fingers.js - v0.0.1 - 2014-06-06
+/*! Fingers.js - v1.0.0 - 2014-06-06
+ * https://github.com/paztis/fingers.js
  *
  * Copyright (c) 2014 Jérôme HENAFF <jerome.henaff@gmail.com>;
  * Licensed under the MIT license */

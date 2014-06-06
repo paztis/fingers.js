@@ -1,15 +1,16 @@
 {
     "name": "fingers.js",
     "title": "Fingers.js",
-    "version": "0.0.1",
+    "description": "A javascript library for synchronous touch gestures",
+    "homepage": "https://github.com/paztis/fingers.js",
+    "version": "1.0.0",
     "author": {
         "name": "Jérôme HENAFF",
         "email": "jerome.henaff@gmail.com"
     },
     "licenses": [
         {
-            "type": "MIT",
-            "url": "https://github.com/eightmedia/hammer.js/blob/master/LICENSE"
+            "type": "MIT"
         }
     ],
     "devDependencies": {
