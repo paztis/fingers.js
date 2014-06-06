@@ -119,3 +119,69 @@ angles are in radian
 - deltaRotation
 - totalScale
 - deltaScale
+
+## Custom Gesture
+Its really easy to create you own Gesture
+
+#### Create your Gesture class
+    var MyGesture = (function (_super) {
+
+        //Constructor
+        function MyGesture(pOptions) {
+            _super.call(this, pOptions, {
+                option_1: "default_value",
+                option_2: "default_value"
+            });
+
+            this.data = {
+                myData1: ...
+                myData2: ...
+            }
+        }
+
+        Fingers.__extend(MyGesture.prototype, _super.prototype, {
+
+            _onFingerAdded: function(pNewFinger, pFingerList) {
+                //If gesture is already listening fingers
+                if(!this.isListening) {
+
+                    //Listening of the fingers
+                    this._addListenedFinger(pNewFinger);
+
+                    //Event fire
+                    this.fire(_super.EVENT_TYPE.start, this.data);
+                }
+            },
+
+            _onFingerUpdate: function(pFinger) {
+                //Event fire
+                this.fire(_super.EVENT_TYPE.move, this.data);
+            },
+
+            _onFingerRemoved: function(pFinger) {
+                if(this.isListenedFinger(pFinger)) {
+
+                    //Event fire
+                    this.fire(_super.EVENT_TYPE.end, this.data);
+
+                    //Stop listening finger
+                    this._removeAllListenedFingers();
+                }
+            }
+        });
+
+        return MyGesture;
+    })(Fingers.Gesture);
+
+    Fingers.gesture.MyGesture = MyGesture;
+
+#### Use it with Fingers
+    var element = document.getElementById('el_id');
+    new Fingers(element)
+        .addGesture(Fingers.gesture.MyGesture, {
+            option_1: "value_1",
+            option_2: "value_2"
+        })
+        .addHandler(function(eventType, data, fingerList) {
+            alert('My Gesture appends');
+        });
