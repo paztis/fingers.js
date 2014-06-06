@@ -75,8 +75,11 @@
             var color = getFingerColor(pFinger);
             pContext.beginPath();
             // a circle at the start
-            pContext.arc(pFinger.getX(), pFinger.getY(), 4, 0,2*Math.PI, false);
+            pContext.arc(pFinger.getX(), pFinger.getY(), 10, 0,2*Math.PI, false);
             pContext.fillStyle = color;
+            pContext.lineWidth = 8;
+            pContext.lineCap="round";
+            pContext.strokeStyle = color;
             pContext.fill();
         }
 
@@ -86,16 +89,12 @@
             pContext.beginPath();
             pContext.moveTo(pFinger.previousP.x, pFinger.previousP.y);
             pContext.lineTo(pFinger.getX(), pFinger.getY());
-            pContext.lineWidth = 4;
-            pContext.strokeStyle = color;
             pContext.stroke();
         }
 
         function endLine(pContext, pFinger) {
             var color = getFingerColor(pFinger);
-            pContext.lineWidth = 4;
-            pContext.fillStyle = color;
-            pContext.fillRect(pFinger.getX()-4, pFinger.getY()-4, 8, 8);  // and a square at the end
+            pContext.fillRect(pFinger.getX()-10, pFinger.getY()-10, 20, 20);  // and a square at the end
 
             deleteFingerColor(pFinger);
         }
