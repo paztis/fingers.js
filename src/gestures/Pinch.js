@@ -11,7 +11,6 @@
 var Pinch = (function (_super) {
 
     var DEFAULT_OPTIONS = {
-        nbFingers: 1,
         pinchInDetect: 0.6,
         pinchOutDetect: 1.4
     };

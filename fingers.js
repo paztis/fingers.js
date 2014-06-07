@@ -1,4 +1,5 @@
-/*! Fingers.js - v0.0.1 - 2014-06-06
+/*! Fingers.js - v1.0.0 - 2014-06-06
+ * https://github.com/paztis/fingers.js
  *
  * Copyright (c) 2014 Jérôme HENAFF <jerome.henaff@gmail.com>;
  * Licensed under the MIT license */
@@ -668,14 +669,6 @@ var FingerUtils = {
         center.y = Math.round(center.y / size);
 
         return center;
-    },
-
-    getElementRelativePosition: function(pElement, pFinger) {
-        var bounding = pElement.getBoundingClientRect();
-        return {
-            x: pFinger.currentP.x - bounding.left,
-            y: pFinger.currentP.y - bounding.top
-        };
     }
 };
 
@@ -935,7 +928,6 @@ Fingers.gesture.Hold = Hold;
 var Pinch = (function (_super) {
 
     var DEFAULT_OPTIONS = {
-        nbFingers: 1,
         pinchInDetect: 0.6,
         pinchOutDetect: 1.4
     };
@@ -1003,19 +995,23 @@ Fingers.gesture.Pinch = Pinch;
 
 var Raw = (function (_super) {
 
+    var DEFAULT_OPTIONS = {
+        nbMaxFingers: Number.MAX_VALUE
+    };
+
     function Raw(pOptions) {
-        _super.call(this, pOptions);
+        _super.call(this, pOptions, DEFAULT_OPTIONS);
     }
 
 
     Fingers.__extend(Raw.prototype, _super.prototype, {
 
         _onFingerAdded: function(pNewFinger, pFingerList) {
-//            if(!this.isListening) {
+            if(this.listenedFingers.length < this.options.nbMaxFingers) {
                 this._addListenedFinger(pNewFinger);
 
                 this.fire(_super.EVENT_TYPE.start, pNewFinger);
-//            }
+            }
         },
 
         _onFingerUpdate: function(pFinger) {
