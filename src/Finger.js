@@ -111,7 +111,7 @@ Finger.prototype = {
     },
 
     getTotalTime: function() {
-        return this._cacheArray.getCachedValueOrUpdate(Finger.cacheIndexes.startTime, this._getDeltaTime, this);
+        return this._cacheArray.getCachedValueOrUpdate(Finger.cacheIndexes.totalTime, this._getTotalTime, this);
     },
     _getTotalTime: function() {
         return this.currentP.timestamp - this.startP.timestamp;

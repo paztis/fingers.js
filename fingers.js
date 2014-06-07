@@ -1,4 +1,4 @@
-/*! Fingers.js - v1.0.0 - 2014-06-06
+/*! Fingers.js - v1.0.0 - 2014-06-08
  * https://github.com/paztis/fingers.js
  *
  * Copyright (c) 2014 Jérôme HENAFF <jerome.henaff@gmail.com>;
@@ -479,7 +479,7 @@ Finger.prototype = {
     },
 
     getTotalTime: function() {
-        return this._cacheArray.getCachedValueOrUpdate(Finger.cacheIndexes.startTime, this._getDeltaTime, this);
+        return this._cacheArray.getCachedValueOrUpdate(Finger.cacheIndexes.totalTime, this._getTotalTime, this);
     },
     _getTotalTime: function() {
         return this.currentP.timestamp - this.startP.timestamp;
