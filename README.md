@@ -1,6 +1,6 @@
 # Fingers.js
 
-#### A javascript library for synchronous touch gestures
+#### A javascript library for simultaneous touch gestures
 Fingers.js is a small javascript library that detects and fire gesture events on DOM objects.<br/>
 This library detects __classical gestures__: Tap, Hold, Swipe, Pinch, Drag, Rotate, Scale.<br/>
 It also detects __multiple gestures on different objects in the same time__.
