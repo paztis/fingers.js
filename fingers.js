@@ -1,4 +1,4 @@
-/*! Fingers.js - v1.0.0 - 2014-06-08
+/*! Fingers.js - v1.0.0 - 2014-06-11
  * https://github.com/paztis/fingers.js
  *
  * Copyright (c) 2014 Jérôme HENAFF <jerome.henaff@gmail.com>;
@@ -45,6 +45,10 @@ var Utils = {
 
     getVelocity: function(deltaTime, deltaPos) {
         return Math.abs(deltaPos / deltaTime) || 0;
+    },
+
+    getOrientedVelocity: function(deltaTime, deltaPos) {
+        return (deltaPos / deltaTime) || 0;
     },
 
     getAngle: function(x, y) {
@@ -408,7 +412,9 @@ Finger.cacheIndexes = {
     velocityX: CACHE_INDEX_CREATOR++,
     velocityY: CACHE_INDEX_CREATOR++,
     velocity: CACHE_INDEX_CREATOR++,
-    velocityAverage: CACHE_INDEX_CREATOR++
+    velocityAverage: CACHE_INDEX_CREATOR++,
+    orientedVelocityX: CACHE_INDEX_CREATOR++,
+    orientedVelocityY: CACHE_INDEX_CREATOR++
 };
 
 Finger.STATE = {
@@ -584,6 +590,20 @@ Finger.prototype = {
     },
     _getVelocityAverage: function() {
         return Utils.getVelocity(this.getTotalTime(), this.getDistance());
+    },
+
+    getOrientedVelocityX: function() {
+        return this._cacheArray.getCachedValueOrUpdate(Finger.cacheIndexes.orientedVelocityX, this._getOrientedVelocityX, this);
+    },
+    _getOrientedVelocityX: function() {
+        return Utils.getOrientedVelocity(this.getDeltaTime(), this.getDeltaX());
+    },
+
+    getOrientedVelocityY: function() {
+        return this._cacheArray.getCachedValueOrUpdate(Finger.cacheIndexes.orientedVelocityY, this._getOrientedVelocityY, this);
+    },
+    _getOrientedVelocityY: function() {
+        return Utils.getOrientedVelocity(this.getDeltaTime(), this.getDeltaY());
     }
 };
 

@@ -22,6 +22,10 @@ var Utils = {
         return Math.abs(deltaPos / deltaTime) || 0;
     },
 
+    getOrientedVelocity: function(deltaTime, deltaPos) {
+        return (deltaPos / deltaTime) || 0;
+    },
+
     getAngle: function(x, y) {
         return Math.atan2(x, y);
     },
