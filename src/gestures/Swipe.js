@@ -45,13 +45,13 @@ var Swipe = (function (_super) {
             if(this.isListenedFinger(pFinger)) {
 
                 var isSameDirection = true;
-                var direction = this.listenedFingers[0].getDirection();
+                var direction = this.listenedFingers[0].getDeltaDirection();
                 var maxVelocityX = 0;
                 var maxVelocityY = 0;
 
                 var size = this.listenedFingers.length;
                 for(var i= 0; i<size; i++) {
-                    isSameDirection = isSameDirection && (direction === this.listenedFingers[i].getDirection());
+                    isSameDirection = isSameDirection && (direction === this.listenedFingers[i].getDeltaDirection());
 
                     maxVelocityX = Math.max(maxVelocityX, this.listenedFingers[i].getVelocityX());
                     maxVelocityY = Math.max(maxVelocityY, this.listenedFingers[i].getVelocityY());

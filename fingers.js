@@ -1,4 +1,4 @@
-/*! Fingers.js - v1.0.0 - 2014-06-11
+/*! Fingers.js - v1.0.1 - 2014-06-12
  * https://github.com/paztis/fingers.js
  *
  * Copyright (c) 2014 Jérôme HENAFF <jerome.henaff@gmail.com>;
@@ -1099,13 +1099,13 @@ var Swipe = (function (_super) {
             if(this.isListenedFinger(pFinger)) {
 
                 var isSameDirection = true;
-                var direction = this.listenedFingers[0].getDirection();
+                var direction = this.listenedFingers[0].getDeltaDirection();
                 var maxVelocityX = 0;
                 var maxVelocityY = 0;
 
                 var size = this.listenedFingers.length;
                 for(var i= 0; i<size; i++) {
-                    isSameDirection = isSameDirection && (direction === this.listenedFingers[i].getDirection());
+                    isSameDirection = isSameDirection && (direction === this.listenedFingers[i].getDeltaDirection());
 
                     maxVelocityX = Math.max(maxVelocityX, this.listenedFingers[i].getVelocityX());
                     maxVelocityY = Math.max(maxVelocityY, this.listenedFingers[i].getVelocityY());
