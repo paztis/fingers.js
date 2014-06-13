@@ -48,6 +48,13 @@ Gesture.prototype = {
         return this;
     },
 
+    removeAllHandlers: function() {
+        this._handlerList.length = 0;
+        this._handlerListSize = 0;
+
+        return this;
+    },
+
     fire: function(pType, pData) {
         for(var i=0; i<this._handlerListSize; i++) {
             this._handlerList[i](pType, pData, this.listenedFingers);

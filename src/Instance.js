@@ -73,8 +73,16 @@ Instance.prototype = {
     },
 
     removeGesture: function(pGesture) {
+        pGesture.removeAllHandlers();
         var index = this.gestureList.indexOf(pGesture);
         this.gestureList.splice(index, 1);
+    },
+
+    removeAllGestures: function() {
+        for(var i= 0, size=this.gestureList.length; i<size; i++) {
+            this.gestureList[i].removeAllHandlers();
+        }
+        this.gestureList.length = 0;
     },
 
     /*---- Native event listening ----*/

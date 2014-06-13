@@ -1,4 +1,4 @@
-/*! Fingers.js - v1.0.1 - 2014-06-13
+/*! Fingers.js - v1.0.2 - 2014-06-13
  * https://github.com/paztis/fingers.js
  *
  * Copyright (c) 2014 Jérôme HENAFF <jerome.henaff@gmail.com>;
@@ -200,8 +200,16 @@ Instance.prototype = {
     },
 
     removeGesture: function(pGesture) {
+        pGesture.removeAllHandlers();
         var index = this.gestureList.indexOf(pGesture);
         this.gestureList.splice(index, 1);
+    },
+
+    removeAllGestures: function() {
+        for(var i= 0, size=this.gestureList.length; i<size; i++) {
+            this.gestureList[i].removeAllHandlers();
+        }
+        this.gestureList.length = 0;
     },
 
     /*---- Native event listening ----*/
@@ -755,6 +763,13 @@ Gesture.prototype = {
         var index = this._handlerList.indexOf(pHandler);
         this._handlerList.splice(index, 1);
         this._handlerListSize--;
+
+        return this;
+    },
+
+    removeAllHandlers: function() {
+        this._handlerList.length = 0;
+        this._handlerListSize = 0;
 
         return this;
     },
