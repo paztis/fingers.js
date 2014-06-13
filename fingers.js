@@ -1,4 +1,4 @@
-/*! Fingers.js - v1.0.1 - 2014-06-12
+/*! Fingers.js - v1.0.1 - 2014-06-13
  * https://github.com/paztis/fingers.js
  *
  * Copyright (c) 2014 Jérôme HENAFF <jerome.henaff@gmail.com>;
@@ -334,12 +334,10 @@ Instance.prototype = {
         if(finger !== undefined) {
             finger._setEndP(pTimestamp);
 
-            for(var i=0, size=this.gestureList.length; i<size; i++) {
-                this.gestureList[i]._onFingerRemoved(finger);
-            }
-
             delete this.fingerMap[pFingerId];
             this.fingerList.splice(this._getFingerPosition(finger), 1);
+
+            finger._clearHandlers();
         }
     },
 
@@ -385,7 +383,8 @@ Fingers.Instance = Instance;
 var Finger = function(pId, pTimestamp, pX, pY) {
     this.id = pId;
     this.state = Finger.STATE.ACTIVE;
-    this._handlerList = [];
+    this._handlerListMove = [];
+    this._handlerListEnd = [];
 
     this.startP = new Position(pTimestamp, pX, pY);
     this.previousP = new Position(pTimestamp, pX, pY);
@@ -437,18 +436,27 @@ Finger.prototype = {
     previousP: null,
     currentP: null,
     _cacheArray: null,
-    _handlerList: null,
+    _handlerListMove: null,
+    _handlerListEnd: null,
     _handlerListSize: 0,
 
-    _addHandler: function(pHandler) {
-        this._handlerList.push(pHandler);
-        this._handlerListSize = this._handlerList.length;
+    _addHandlers: function(pMoveHandler, pEndHandler) {
+        this._handlerListMove.push(pMoveHandler);
+        this._handlerListEnd.push(pEndHandler);
+        this._handlerListSize = this._handlerListMove.length;
     },
 
-    _removeHandler: function(pHandler) {
-        var index = this._handlerList.indexOf(pHandler);
-        this._handlerList.splice(index, 1);
-        this._handlerListSize = this._handlerList.length;
+    _removeHandlers: function(pMoveHandler, pEndHandler) {
+        var index = this._handlerListMove.indexOf(pMoveHandler);
+        this._handlerListMove.splice(index, 1);
+        this._handlerListEnd.splice(index, 1);
+        this._handlerListSize = this._handlerListMove.length;
+    },
+
+    _clearHandlers: function() {
+        this._handlerListMove.length = 0;
+        this._handlerListEnd.length = 0;
+        this._handlerListSize = 0;
     },
 
     _setCurrentP: function(pTimestamp, pX, pY, pForceSetter) {
@@ -459,7 +467,7 @@ Finger.prototype = {
             this.currentP.set(pTimestamp, pX, pY);
 
             for(var i= 0; i<this._handlerListSize; i++) {
-                this._handlerList[i](this);
+                this._handlerListMove[i](this);
             }
         }
     },
@@ -468,7 +476,11 @@ Finger.prototype = {
         //Only update if end event is not "instant" with move event
         if((pTimestamp - this.getTime()) > Finger.CONSTANTS.inactivityTime) {
             this._setCurrentP(pTimestamp, this.getX(), this.getY(), true);
-            this.state = Finger.STATE.REMOVED;
+        }
+
+        this.state = Finger.STATE.REMOVED;
+        for(var i= 0; i<this._handlerListSize; i++) {
+            this._handlerListEnd[i](this);
         }
     },
 
@@ -712,6 +724,7 @@ var Gesture = function(pOptions, pDefaultOptions) {
     this._handlerList = [];
     this.listenedFingers = [];
     this._onFingerUpdateF = this._onFingerUpdate.bind(this);
+    this._onFingerRemovedF = this._onFingerRemoved.bind(this);
 };
 
 Gesture.EVENT_TYPE = {
@@ -758,6 +771,7 @@ Gesture.prototype = {
     _onFingerUpdateF: null,
     _onFingerUpdate: function(pFinger) { /*To Override*/ },
 
+    _onFingerRemovedF: null,
     _onFingerRemoved: function(pFinger) { /*To Override*/ },
 
     /*---- Actions ----*/
@@ -768,7 +782,7 @@ Gesture.prototype = {
     },
     _addListenedFinger: function(pFinger) {
         this.listenedFingers.push(pFinger);
-        pFinger._addHandler(this._onFingerUpdateF);
+        pFinger._addHandlers(this._onFingerUpdateF, this._onFingerRemovedF);
 
         if(!this.isListening) {
             this.isListening = true;
@@ -781,7 +795,7 @@ Gesture.prototype = {
         }
     },
     _removeListenedFinger: function(pFinger) {
-        pFinger._removeHandler(this._onFingerUpdateF);
+        pFinger._removeHandlers(this._onFingerUpdateF, this._onFingerRemovedF);
 
         var index = this.listenedFingers.indexOf(pFinger);
         this.listenedFingers.splice(index, 1);
@@ -796,7 +810,7 @@ Gesture.prototype = {
         for(var i= 0, size=this.listenedFingers.length; i<size; i++) {
             finger = this.listenedFingers[i];
 
-            finger._removeHandler(this._onFingerUpdateF);
+            finger._removeHandlers(this._onFingerUpdateF, this._onFingerRemovedF);
         }
 
         this.listenedFingers.length = 0;
@@ -851,11 +865,9 @@ var Drag = (function (_super) {
         },
 
         _onFingerRemoved: function(pFinger) {
-            if(this.isListenedFinger(pFinger)) {
-                this.fire(_super.EVENT_TYPE.end, null);
+            this.fire(_super.EVENT_TYPE.end, null);
 
-                this._removeAllListenedFingers();
-            }
+            this._removeAllListenedFingers();
         }
     });
 
@@ -914,9 +926,7 @@ var Hold = (function (_super) {
         },
 
         _onFingerRemoved: function(pFinger) {
-            if(this.isListenedFinger(pFinger)) {
-                this._onHoldCancel();
-            }
+            this._onHoldCancel();
         },
 
         _onHoldTimeLeftF: null,
@@ -977,18 +987,16 @@ var Pinch = (function (_super) {
         _onFingerUpdate: function(pFinger) {},
 
         _onFingerRemoved: function(pFinger) {
-            if(this.isListenedFinger(pFinger)) {
-                var newDistance = this._getFingersDistance();
-                var scale = newDistance / this._startDistance;
+            var newDistance = this._getFingersDistance();
+            var scale = newDistance / this._startDistance;
 
-                if(scale <= this.options.pinchInDetect || scale >= this.options.pinchOutDetect) {
-                    this.data.grow = (scale > 1) ? Utils.GROW.OUT : Utils.GROW.IN;
-                    this.data.scale = scale;
-                    this.fire(_super.EVENT_TYPE.instant, this.data);
-                }
-
-                this._removeAllListenedFingers();
+            if(scale <= this.options.pinchInDetect || scale >= this.options.pinchOutDetect) {
+                this.data.grow = (scale > 1) ? Utils.GROW.OUT : Utils.GROW.IN;
+                this.data.scale = scale;
+                this.fire(_super.EVENT_TYPE.instant, this.data);
             }
+
+            this._removeAllListenedFingers();
         },
 
         _getFingersDistance: function() {
@@ -1039,11 +1047,9 @@ var Raw = (function (_super) {
         },
 
         _onFingerRemoved: function(pFinger) {
-            if(this.isListenedFinger(pFinger)) {
-                this.fire(_super.EVENT_TYPE.end, pFinger);
+            this.fire(_super.EVENT_TYPE.end, pFinger);
 
-                this._removeListenedFinger(pFinger);
-            }
+            this._removeListenedFinger(pFinger);
         }
     });
 
@@ -1096,31 +1102,28 @@ var Swipe = (function (_super) {
         },
 
         _onFingerRemoved: function(pFinger) {
-            if(this.isListenedFinger(pFinger)) {
+            var isSameDirection = true;
+            var direction = this.listenedFingers[0].getDeltaDirection();
+            var maxVelocityX = 0;
+            var maxVelocityY = 0;
 
-                var isSameDirection = true;
-                var direction = this.listenedFingers[0].getDeltaDirection();
-                var maxVelocityX = 0;
-                var maxVelocityY = 0;
+            var size = this.listenedFingers.length;
+            for(var i= 0; i<size; i++) {
+                isSameDirection = isSameDirection && (direction === this.listenedFingers[i].getDeltaDirection());
 
-                var size = this.listenedFingers.length;
-                for(var i= 0; i<size; i++) {
-                    isSameDirection = isSameDirection && (direction === this.listenedFingers[i].getDeltaDirection());
-
-                    maxVelocityX = Math.max(maxVelocityX, this.listenedFingers[i].getVelocityX());
-                    maxVelocityY = Math.max(maxVelocityY, this.listenedFingers[i].getVelocityY());
-                }
-
-                if(isSameDirection &&
-                    (maxVelocityX > this.options.swipeVelocityX || maxVelocityY > this.options.swipeVelocityY)) {
-                    this.data.direction = direction;
-                    this.data.velocity = (maxVelocityX > this.options.swipeVelocityX) ? maxVelocityX : maxVelocityY;
-
-                    this.fire(_super.EVENT_TYPE.instant, this.data);
-                }
-
-                this._removeAllListenedFingers();
+                maxVelocityX = Math.max(maxVelocityX, this.listenedFingers[i].getVelocityX());
+                maxVelocityY = Math.max(maxVelocityY, this.listenedFingers[i].getVelocityY());
             }
+
+            if(isSameDirection &&
+                (maxVelocityX > this.options.swipeVelocityX || maxVelocityY > this.options.swipeVelocityY)) {
+                this.data.direction = direction;
+                this.data.velocity = (maxVelocityX > this.options.swipeVelocityX) ? maxVelocityX : maxVelocityY;
+
+                this.fire(_super.EVENT_TYPE.instant, this.data);
+            }
+
+            this._removeAllListenedFingers();
         }
     });
 
@@ -1176,15 +1179,13 @@ var Tap = (function (_super) {
         },
 
         _onFingerRemoved: function(pFinger) {
-            if(this.isListenedFinger(pFinger)) {
-                this._removeAllListenedFingers();
+            this._removeAllListenedFingers();
 
-                if(pFinger.getTotalTime() < this.options.tapInterval) {
-                    this.data.lastTapTimestamp = pFinger.getTime();
-                    this.data.nbTap++;
+            if(pFinger.getTotalTime() < this.options.tapInterval) {
+                this.data.lastTapTimestamp = pFinger.getTime();
+                this.data.nbTap++;
 
-                    this.fire(_super.EVENT_TYPE.instant, this.data);
-                }
+                this.fire(_super.EVENT_TYPE.instant, this.data);
             }
         },
 
@@ -1278,11 +1279,9 @@ var Transform = (function (_super) {
         },
 
         _onFingerRemoved: function(pFinger) {
-            if(this.isListenedFinger(pFinger)) {
-                this.fire(_super.EVENT_TYPE.end, this.data);
+            this.fire(_super.EVENT_TYPE.end, this.data);
 
-                this._removeAllListenedFingers();
-            }
+            this._removeAllListenedFingers();
         },
 
         _getFingersAngle: function() {

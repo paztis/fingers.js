@@ -48,9 +48,7 @@ var Hold = (function (_super) {
         },
 
         _onFingerRemoved: function(pFinger) {
-            if(this.isListenedFinger(pFinger)) {
-                this._onHoldCancel();
-            }
+            this._onHoldCancel();
         },
 
         _onHoldTimeLeftF: null,

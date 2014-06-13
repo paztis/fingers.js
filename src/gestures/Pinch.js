@@ -40,18 +40,16 @@ var Pinch = (function (_super) {
         _onFingerUpdate: function(pFinger) {},
 
         _onFingerRemoved: function(pFinger) {
-            if(this.isListenedFinger(pFinger)) {
-                var newDistance = this._getFingersDistance();
-                var scale = newDistance / this._startDistance;
+            var newDistance = this._getFingersDistance();
+            var scale = newDistance / this._startDistance;
 
-                if(scale <= this.options.pinchInDetect || scale >= this.options.pinchOutDetect) {
-                    this.data.grow = (scale > 1) ? Utils.GROW.OUT : Utils.GROW.IN;
-                    this.data.scale = scale;
-                    this.fire(_super.EVENT_TYPE.instant, this.data);
-                }
-
-                this._removeAllListenedFingers();
+            if(scale <= this.options.pinchInDetect || scale >= this.options.pinchOutDetect) {
+                this.data.grow = (scale > 1) ? Utils.GROW.OUT : Utils.GROW.IN;
+                this.data.scale = scale;
+                this.fire(_super.EVENT_TYPE.instant, this.data);
             }
+
+            this._removeAllListenedFingers();
         },
 
         _getFingersDistance: function() {

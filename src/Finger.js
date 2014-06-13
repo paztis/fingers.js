@@ -13,7 +13,8 @@
 var Finger = function(pId, pTimestamp, pX, pY) {
     this.id = pId;
     this.state = Finger.STATE.ACTIVE;
-    this._handlerList = [];
+    this._handlerListMove = [];
+    this._handlerListEnd = [];
 
     this.startP = new Position(pTimestamp, pX, pY);
     this.previousP = new Position(pTimestamp, pX, pY);
@@ -65,18 +66,27 @@ Finger.prototype = {
     previousP: null,
     currentP: null,
     _cacheArray: null,
-    _handlerList: null,
+    _handlerListMove: null,
+    _handlerListEnd: null,
     _handlerListSize: 0,
 
-    _addHandler: function(pHandler) {
-        this._handlerList.push(pHandler);
-        this._handlerListSize = this._handlerList.length;
+    _addHandlers: function(pMoveHandler, pEndHandler) {
+        this._handlerListMove.push(pMoveHandler);
+        this._handlerListEnd.push(pEndHandler);
+        this._handlerListSize = this._handlerListMove.length;
     },
 
-    _removeHandler: function(pHandler) {
-        var index = this._handlerList.indexOf(pHandler);
-        this._handlerList.splice(index, 1);
-        this._handlerListSize = this._handlerList.length;
+    _removeHandlers: function(pMoveHandler, pEndHandler) {
+        var index = this._handlerListMove.indexOf(pMoveHandler);
+        this._handlerListMove.splice(index, 1);
+        this._handlerListEnd.splice(index, 1);
+        this._handlerListSize = this._handlerListMove.length;
+    },
+
+    _clearHandlers: function() {
+        this._handlerListMove.length = 0;
+        this._handlerListEnd.length = 0;
+        this._handlerListSize = 0;
     },
 
     _setCurrentP: function(pTimestamp, pX, pY, pForceSetter) {
@@ -87,7 +97,7 @@ Finger.prototype = {
             this.currentP.set(pTimestamp, pX, pY);
 
             for(var i= 0; i<this._handlerListSize; i++) {
-                this._handlerList[i](this);
+                this._handlerListMove[i](this);
             }
         }
     },
@@ -96,7 +106,11 @@ Finger.prototype = {
         //Only update if end event is not "instant" with move event
         if((pTimestamp - this.getTime()) > Finger.CONSTANTS.inactivityTime) {
             this._setCurrentP(pTimestamp, this.getX(), this.getY(), true);
-            this.state = Finger.STATE.REMOVED;
+        }
+
+        this.state = Finger.STATE.REMOVED;
+        for(var i= 0; i<this._handlerListSize; i++) {
+            this._handlerListEnd[i](this);
         }
     },
 

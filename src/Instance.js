@@ -207,12 +207,10 @@ Instance.prototype = {
         if(finger !== undefined) {
             finger._setEndP(pTimestamp);
 
-            for(var i=0, size=this.gestureList.length; i<size; i++) {
-                this.gestureList[i]._onFingerRemoved(finger);
-            }
-
             delete this.fingerMap[pFingerId];
             this.fingerList.splice(this._getFingerPosition(finger), 1);
+
+            finger._clearHandlers();
         }
     },
 

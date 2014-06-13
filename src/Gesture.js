@@ -13,6 +13,7 @@ var Gesture = function(pOptions, pDefaultOptions) {
     this._handlerList = [];
     this.listenedFingers = [];
     this._onFingerUpdateF = this._onFingerUpdate.bind(this);
+    this._onFingerRemovedF = this._onFingerRemoved.bind(this);
 };
 
 Gesture.EVENT_TYPE = {
@@ -59,6 +60,7 @@ Gesture.prototype = {
     _onFingerUpdateF: null,
     _onFingerUpdate: function(pFinger) { /*To Override*/ },
 
+    _onFingerRemovedF: null,
     _onFingerRemoved: function(pFinger) { /*To Override*/ },
 
     /*---- Actions ----*/
@@ -69,7 +71,7 @@ Gesture.prototype = {
     },
     _addListenedFinger: function(pFinger) {
         this.listenedFingers.push(pFinger);
-        pFinger._addHandler(this._onFingerUpdateF);
+        pFinger._addHandlers(this._onFingerUpdateF, this._onFingerRemovedF);
 
         if(!this.isListening) {
             this.isListening = true;
@@ -82,7 +84,7 @@ Gesture.prototype = {
         }
     },
     _removeListenedFinger: function(pFinger) {
-        pFinger._removeHandler(this._onFingerUpdateF);
+        pFinger._removeHandlers(this._onFingerUpdateF, this._onFingerRemovedF);
 
         var index = this.listenedFingers.indexOf(pFinger);
         this.listenedFingers.splice(index, 1);
@@ -97,7 +99,7 @@ Gesture.prototype = {
         for(var i= 0, size=this.listenedFingers.length; i<size; i++) {
             finger = this.listenedFingers[i];
 
-            finger._removeHandler(this._onFingerUpdateF);
+            finger._removeHandlers(this._onFingerUpdateF, this._onFingerRemovedF);
         }
 
         this.listenedFingers.length = 0;

@@ -34,11 +34,9 @@ var Raw = (function (_super) {
         },
 
         _onFingerRemoved: function(pFinger) {
-            if(this.isListenedFinger(pFinger)) {
-                this.fire(_super.EVENT_TYPE.end, pFinger);
+            this.fire(_super.EVENT_TYPE.end, pFinger);
 
-                this._removeListenedFinger(pFinger);
-            }
+            this._removeListenedFinger(pFinger);
         }
     });
 

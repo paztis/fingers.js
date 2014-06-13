@@ -30,11 +30,9 @@ var Drag = (function (_super) {
         },
 
         _onFingerRemoved: function(pFinger) {
-            if(this.isListenedFinger(pFinger)) {
-                this.fire(_super.EVENT_TYPE.end, null);
+            this.fire(_super.EVENT_TYPE.end, null);
 
-                this._removeAllListenedFingers();
-            }
+            this._removeAllListenedFingers();
         }
     });
 

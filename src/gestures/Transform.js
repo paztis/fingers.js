@@ -76,11 +76,9 @@ var Transform = (function (_super) {
         },
 
         _onFingerRemoved: function(pFinger) {
-            if(this.isListenedFinger(pFinger)) {
-                this.fire(_super.EVENT_TYPE.end, this.data);
+            this.fire(_super.EVENT_TYPE.end, this.data);
 
-                this._removeAllListenedFingers();
-            }
+            this._removeAllListenedFingers();
         },
 
         _getFingersAngle: function() {

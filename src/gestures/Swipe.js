@@ -42,31 +42,28 @@ var Swipe = (function (_super) {
         },
 
         _onFingerRemoved: function(pFinger) {
-            if(this.isListenedFinger(pFinger)) {
+            var isSameDirection = true;
+            var direction = this.listenedFingers[0].getDeltaDirection();
+            var maxVelocityX = 0;
+            var maxVelocityY = 0;
 
-                var isSameDirection = true;
-                var direction = this.listenedFingers[0].getDeltaDirection();
-                var maxVelocityX = 0;
-                var maxVelocityY = 0;
+            var size = this.listenedFingers.length;
+            for(var i= 0; i<size; i++) {
+                isSameDirection = isSameDirection && (direction === this.listenedFingers[i].getDeltaDirection());
 
-                var size = this.listenedFingers.length;
-                for(var i= 0; i<size; i++) {
-                    isSameDirection = isSameDirection && (direction === this.listenedFingers[i].getDeltaDirection());
-
-                    maxVelocityX = Math.max(maxVelocityX, this.listenedFingers[i].getVelocityX());
-                    maxVelocityY = Math.max(maxVelocityY, this.listenedFingers[i].getVelocityY());
-                }
-
-                if(isSameDirection &&
-                    (maxVelocityX > this.options.swipeVelocityX || maxVelocityY > this.options.swipeVelocityY)) {
-                    this.data.direction = direction;
-                    this.data.velocity = (maxVelocityX > this.options.swipeVelocityX) ? maxVelocityX : maxVelocityY;
-
-                    this.fire(_super.EVENT_TYPE.instant, this.data);
-                }
-
-                this._removeAllListenedFingers();
+                maxVelocityX = Math.max(maxVelocityX, this.listenedFingers[i].getVelocityX());
+                maxVelocityY = Math.max(maxVelocityY, this.listenedFingers[i].getVelocityY());
             }
+
+            if(isSameDirection &&
+                (maxVelocityX > this.options.swipeVelocityX || maxVelocityY > this.options.swipeVelocityY)) {
+                this.data.direction = direction;
+                this.data.velocity = (maxVelocityX > this.options.swipeVelocityX) ? maxVelocityX : maxVelocityY;
+
+                this.fire(_super.EVENT_TYPE.instant, this.data);
+            }
+
+            this._removeAllListenedFingers();
         }
     });
 

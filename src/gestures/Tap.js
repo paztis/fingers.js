@@ -45,15 +45,13 @@ var Tap = (function (_super) {
         },
 
         _onFingerRemoved: function(pFinger) {
-            if(this.isListenedFinger(pFinger)) {
-                this._removeAllListenedFingers();
+            this._removeAllListenedFingers();
 
-                if(pFinger.getTotalTime() < this.options.tapInterval) {
-                    this.data.lastTapTimestamp = pFinger.getTime();
-                    this.data.nbTap++;
+            if(pFinger.getTotalTime() < this.options.tapInterval) {
+                this.data.lastTapTimestamp = pFinger.getTime();
+                this.data.nbTap++;
 
-                    this.fire(_super.EVENT_TYPE.instant, this.data);
-                }
+                this.fire(_super.EVENT_TYPE.instant, this.data);
             }
         },
 
