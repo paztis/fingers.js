@@ -1,4 +1,4 @@
-/*! Fingers.js - v1.0.2 - 2014-06-13
+/*! Fingers.js - v1.0.3 - 2014-06-13
  * https://github.com/paztis/fingers.js
  *
  * Copyright (c) 2014 Jérôme HENAFF <jerome.henaff@gmail.com>;
@@ -345,7 +345,7 @@ Instance.prototype = {
             delete this.fingerMap[pFingerId];
             this.fingerList.splice(this._getFingerPosition(finger), 1);
 
-            finger._clearHandlers();
+            finger._clearHandlerObjects();
         }
     },
 
@@ -391,8 +391,7 @@ Fingers.Instance = Instance;
 var Finger = function(pId, pTimestamp, pX, pY) {
     this.id = pId;
     this.state = Finger.STATE.ACTIVE;
-    this._handlerListMove = [];
-    this._handlerListEnd = [];
+    this._handlerList = [];
 
     this.startP = new Position(pTimestamp, pX, pY);
     this.previousP = new Position(pTimestamp, pX, pY);
@@ -444,26 +443,22 @@ Finger.prototype = {
     previousP: null,
     currentP: null,
     _cacheArray: null,
-    _handlerListMove: null,
-    _handlerListEnd: null,
+    _handlerList: null,
     _handlerListSize: 0,
 
-    _addHandlers: function(pMoveHandler, pEndHandler) {
-        this._handlerListMove.push(pMoveHandler);
-        this._handlerListEnd.push(pEndHandler);
-        this._handlerListSize = this._handlerListMove.length;
+    _addHandlerObject: function(pHandlerObject) {
+        this._handlerList.push(pHandlerObject);
+        this._handlerListSize = this._handlerList.length;
     },
 
-    _removeHandlers: function(pMoveHandler, pEndHandler) {
-        var index = this._handlerListMove.indexOf(pMoveHandler);
-        this._handlerListMove.splice(index, 1);
-        this._handlerListEnd.splice(index, 1);
-        this._handlerListSize = this._handlerListMove.length;
+    _removeHandlerObject: function(pHandlerObject) {
+        var index = this._handlerList.indexOf(pHandlerObject);
+        this._handlerList.splice(index, 1);
+        this._handlerListSize = this._handlerList.length;
     },
 
-    _clearHandlers: function() {
-        this._handlerListMove.length = 0;
-        this._handlerListEnd.length = 0;
+    _clearHandlerObjects: function() {
+        this._handlerList.length = 0;
         this._handlerListSize = 0;
     },
 
@@ -475,7 +470,7 @@ Finger.prototype = {
             this.currentP.set(pTimestamp, pX, pY);
 
             for(var i= 0; i<this._handlerListSize; i++) {
-                this._handlerListMove[i](this);
+                this._handlerList[i]._onFingerUpdate(this);
             }
         }
     },
@@ -487,8 +482,10 @@ Finger.prototype = {
         }
 
         this.state = Finger.STATE.REMOVED;
-        for(var i= 0; i<this._handlerListSize; i++) {
-            this._handlerListEnd[i](this);
+
+        var handlerList = this._handlerList.slice(0);
+        for(var i= 0; i<handlerList.length; i++) {
+            handlerList[i]._onFingerRemoved(this);
         }
     },
 
@@ -731,8 +728,6 @@ var Gesture = function(pOptions, pDefaultOptions) {
     this.options = Fingers.__extend({}, pDefaultOptions || {}, pOptions || {});
     this._handlerList = [];
     this.listenedFingers = [];
-    this._onFingerUpdateF = this._onFingerUpdate.bind(this);
-    this._onFingerRemovedF = this._onFingerRemoved.bind(this);
 };
 
 Gesture.EVENT_TYPE = {
@@ -783,10 +778,8 @@ Gesture.prototype = {
     /*---- Fingers events ----*/
     _onFingerAdded: function(pNewFinger, pFingerList) { /*To Override*/ },
 
-    _onFingerUpdateF: null,
     _onFingerUpdate: function(pFinger) { /*To Override*/ },
 
-    _onFingerRemovedF: null,
     _onFingerRemoved: function(pFinger) { /*To Override*/ },
 
     /*---- Actions ----*/
@@ -797,7 +790,7 @@ Gesture.prototype = {
     },
     _addListenedFinger: function(pFinger) {
         this.listenedFingers.push(pFinger);
-        pFinger._addHandlers(this._onFingerUpdateF, this._onFingerRemovedF);
+        pFinger._addHandlerObject(this);
 
         if(!this.isListening) {
             this.isListening = true;
@@ -810,7 +803,7 @@ Gesture.prototype = {
         }
     },
     _removeListenedFinger: function(pFinger) {
-        pFinger._removeHandlers(this._onFingerUpdateF, this._onFingerRemovedF);
+        pFinger._removeHandlerObject(this);
 
         var index = this.listenedFingers.indexOf(pFinger);
         this.listenedFingers.splice(index, 1);
@@ -825,7 +818,7 @@ Gesture.prototype = {
         for(var i= 0, size=this.listenedFingers.length; i<size; i++) {
             finger = this.listenedFingers[i];
 
-            finger._removeHandlers(this._onFingerUpdateF, this._onFingerRemovedF);
+            finger._removeHandlerObject(this);
         }
 
         this.listenedFingers.length = 0;

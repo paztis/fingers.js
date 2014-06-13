@@ -218,7 +218,7 @@ Instance.prototype = {
             delete this.fingerMap[pFingerId];
             this.fingerList.splice(this._getFingerPosition(finger), 1);
 
-            finger._clearHandlers();
+            finger._clearHandlerObjects();
         }
     },
 
