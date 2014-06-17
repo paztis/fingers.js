@@ -101,11 +101,12 @@ var ZoneEntering = (function (_super) {
         },
 
         _checkZone: function(pZone, pFinger) {
-            if(this._zoneMap[pZone.id] === false && this._isInZone(pZone, pFinger.getX(), pFinger.getY())) {
+            var isInZone = this._isInZone(pZone, pFinger.getX(), pFinger.getY());
+            if(this._zoneMap[pZone.id] === false && isInZone) {
                 this._zoneMap[pZone.id] = true;
                 this._fireEnterZone(pZone);
             }
-            else if(this._zoneMap[pZone.id] === true && !this._isInZone(pZone, pFinger.getX(), pFinger.getY())) {
+            else if(this._zoneMap[pZone.id] === true && !isInZone) {
                 this._zoneMap[pZone.id] = false;
                 this._fireLeaveZone(pZone);
             }
