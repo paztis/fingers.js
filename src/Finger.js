@@ -64,6 +64,7 @@ Finger.prototype = {
     startP: null,
     previousP: null,
     currentP: null,
+    nbListeningInstances: 0,
     _cacheArray: null,
     _handlerList: null,
     _handlerListSize: 0,

@@ -20,6 +20,12 @@ Instance.HAS_TOUCHEVENTS = ('ontouchstart' in window);
 Instance.IS_MOBILE = /mobile|tablet|ip(ad|hone|od)|android|silk/i.test(navigator.userAgent);
 Instance.LISTEN_TOUCH_EVENTS = (Instance.HAS_TOUCHEVENTS && Instance.IS_MOBILE);
 
+/**
+ * @property fingerMap
+ * @type {Object.<Number, Finger>}
+ */
+Instance.FINGER_MAP = {};
+
 Instance.prototype = {
     /**
      * @property element
@@ -28,17 +34,16 @@ Instance.prototype = {
     element: null,
 
     /**
-     * @property fingerMap
-     * @type {Object.<Number, Finger>}
-     */
-    fingerMap: null,
-
-    /**
      * @property fingerList
      * @type {Array.<Finger>}
      */
     fingerList: null,
 
+    /**
+     * @property FINGER_MAP
+     * @type {Object.<Number, Finger>}
+     */
+    fingerCreatedMap: null,
 
     /**
      * @property fingerIdList
@@ -49,8 +54,8 @@ Instance.prototype = {
     /*---- INIT ----*/
     _init: function(pElement) {
         this.element = pElement;
-        this.fingerMap = {};
         this.fingerList = [];
+        this.fingerCreatedMap = {};
         this.gestureList = [];
 
         this.startListening();
@@ -160,9 +165,10 @@ Instance.prototype = {
 
     _onTouchCancel: function(pTouchEvent) {
         //Security to prevent chrome bugs
+        var finger;
         for(var i= 0, size=pTouchEvent.changedTouches.length; i<size; i++) {
-
-            if(this.fingerMap[pTouchEvent.changedTouches[i].identifier] !== undefined) {
+            finger = Instance.FINGER_MAP[pTouchEvent.changedTouches[i].identifier];
+            if(finger !== undefined && this._getFingerPosition(finger) !== -1) {
                 //Remove all fingers
                 this._removeAllFingers(pTouchEvent.timeStamp);
                 break;
@@ -200,10 +206,18 @@ Instance.prototype = {
 
     /*---- Fingers ----*/
     _createFinger: function(pFingerId, pTimestamp, pX, pY) {
-        var finger = new Finger(pFingerId, pTimestamp, pX, pY);
+        var finger;
+        if(Instance.FINGER_MAP[pFingerId] === undefined) {
+            finger = new Finger(pFingerId, pTimestamp, pX, pY);
+            Instance.FINGER_MAP[pFingerId] = finger;
+            this.fingerCreatedMap[pFingerId] = finger;
+        }
+        else {
+            finger = Instance.FINGER_MAP[pFingerId];
+        }
 
-        this.fingerMap[finger.id] = finger;
         this.fingerList.push(finger);
+        finger.nbListeningInstances++;
 
         for(var i=0, size=this.gestureList.length; i<size; i++) {
             this.gestureList[i]._onFingerAdded(finger, this.fingerList);
@@ -211,27 +225,32 @@ Instance.prototype = {
     },
 
     _removeFinger: function(pFingerId, pTimestamp) {
-        var finger = this.fingerMap[pFingerId];
+        var finger = Instance.FINGER_MAP[pFingerId];
         if(finger !== undefined) {
-            finger._setEndP(pTimestamp);
-
-            delete this.fingerMap[pFingerId];
             this.fingerList.splice(this._getFingerPosition(finger), 1);
+            delete this.fingerCreatedMap[finger.id];
+            finger.nbListeningInstances--;
 
-            finger._clearHandlerObjects();
+            //Only last one can remove a finger
+            if(finger.nbListeningInstances === 0) {
+                finger._setEndP(pTimestamp);
+                delete Instance.FINGER_MAP[finger.id];
+
+                finger._clearHandlerObjects();
+            }
         }
     },
 
     _removeAllFingers: function(pTimestamp) {
         var list = this.fingerList.splice(0);
         for(var i= 0, size=list.length; i<size; i++) {
-
             this._removeFinger(list[i].id, pTimestamp);
         }
     },
 
     _updateFingerPosition: function(pFingerId, pTimestamp, pX, pY) {
-        var finger = this.fingerMap[pFingerId];
+        //Only creator can update a finger
+        var finger = this.fingerCreatedMap[pFingerId];
         if(finger !== undefined) {
             finger._setCurrentP(pTimestamp, pX, pY);
         }
