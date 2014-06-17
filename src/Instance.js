@@ -21,8 +21,8 @@ Instance.IS_MOBILE = /mobile|tablet|ip(ad|hone|od)|android|silk/i.test(navigator
 Instance.LISTEN_TOUCH_EVENTS = (Instance.HAS_TOUCHEVENTS && Instance.IS_MOBILE);
 
 /**
- * @property fingerMap
- * @type {Object.<Number, Finger>}
+ * @property FINGER_MAP
+ * @type {Object.<Number>, Finger>}
  */
 Instance.FINGER_MAP = {};
 
@@ -40,8 +40,8 @@ Instance.prototype = {
     fingerList: null,
 
     /**
-     * @property FINGER_MAP
-     * @type {Object.<Number, Finger>}
+     * @property fingerCreatedMap
+     * @type {Object.<Number>, Finger>}
      */
     fingerCreatedMap: null,
 
@@ -179,12 +179,16 @@ Instance.prototype = {
     /*-------- Mouse events ----*/
     _onMouseDown: function(pMouseEvent) {
         if(pMouseEvent.button === 0) {
-            document.addEventListener("mousemove", this._onMouseMoveF);
-            document.addEventListener("mouseup", this._onMouseUpF);
+            //Prevention against alert popups that loose mouse finger reference
+            var finger = Instance.FINGER_MAP[pMouseEvent.button];
+            if(finger === undefined || this._getFingerPosition(finger) === -1) {
+                document.addEventListener("mousemove", this._onMouseMoveF);
+                document.addEventListener("mouseup", this._onMouseUpF);
 
-            this._createFinger(pMouseEvent.button, pMouseEvent.timeStamp, pMouseEvent.pageX, pMouseEvent.pageY);
+                this._createFinger(pMouseEvent.button, pMouseEvent.timeStamp, pMouseEvent.pageX, pMouseEvent.pageY);
 
-            pMouseEvent.preventDefault();
+                pMouseEvent.preventDefault();
+            }
         }
     },
 
