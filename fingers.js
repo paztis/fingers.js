@@ -1,4 +1,4 @@
-/*! Fingers.js - v1.0.4 - 2014-06-17
+/*! Fingers.js - v1.0.5 - 2014-06-17
  * https://github.com/paztis/fingers.js
  *
  * Copyright (c) 2014 Jérôme HENAFF <jerome.henaff@gmail.com>;
@@ -148,8 +148,8 @@ Instance.IS_MOBILE = /mobile|tablet|ip(ad|hone|od)|android|silk/i.test(navigator
 Instance.LISTEN_TOUCH_EVENTS = (Instance.HAS_TOUCHEVENTS && Instance.IS_MOBILE);
 
 /**
- * @property fingerMap
- * @type {Object.<Number, Finger>}
+ * @property FINGER_MAP
+ * @type {Object.<Number>, Finger>}
  */
 Instance.FINGER_MAP = {};
 
@@ -167,8 +167,8 @@ Instance.prototype = {
     fingerList: null,
 
     /**
-     * @property FINGER_MAP
-     * @type {Object.<Number, Finger>}
+     * @property fingerCreatedMap
+     * @type {Object.<Number>, Finger>}
      */
     fingerCreatedMap: null,
 
@@ -306,12 +306,16 @@ Instance.prototype = {
     /*-------- Mouse events ----*/
     _onMouseDown: function(pMouseEvent) {
         if(pMouseEvent.button === 0) {
-            document.addEventListener("mousemove", this._onMouseMoveF);
-            document.addEventListener("mouseup", this._onMouseUpF);
+            //Prevention against alert popups that loose mouse finger reference
+            var finger = Instance.FINGER_MAP[pMouseEvent.button];
+            if(finger === undefined || this._getFingerPosition(finger) === -1) {
+                document.addEventListener("mousemove", this._onMouseMoveF);
+                document.addEventListener("mouseup", this._onMouseUpF);
 
-            this._createFinger(pMouseEvent.button, pMouseEvent.timeStamp, pMouseEvent.pageX, pMouseEvent.pageY);
+                this._createFinger(pMouseEvent.button, pMouseEvent.timeStamp, pMouseEvent.pageX, pMouseEvent.pageY);
 
-            pMouseEvent.preventDefault();
+                pMouseEvent.preventDefault();
+            }
         }
     },
 
@@ -1378,6 +1382,146 @@ var Scale = (function (_super) {
 })(Transform);
 
 Fingers.gesture.Scale = Scale;
+
+/**
+ * @module gestures
+ *
+ * @class ZoneEntering
+ * @constructor
+ * @param {Object} pOptions
+ * @return {ZoneEntering}
+ */
+
+
+var ZoneEntering = (function (_super) {
+
+    var DEFAULT_OPTIONS = {
+    };
+
+    function ZoneEntering(pOptions) {
+        _super.call(this, pOptions, DEFAULT_OPTIONS);
+        this._zoneList = [];
+        this._zoneMap = {};
+    }
+
+    ZoneEntering.TYPE = {
+        enter: "enter",
+        leave: "leave"
+    };
+    ZoneEntering.LAST_ZONE_ID = 0;
+
+    Fingers.__extend(ZoneEntering.prototype, _super.prototype, {
+
+        _zoneList: null,
+        _zoneMap: null,
+        _zoneSize: 0,
+
+        _onFingerAdded: function(pNewFinger, pFingerList) {
+            if(this.listenedFingers.length === 0) {
+                this._addListenedFinger(pNewFinger);
+
+                for(var i=0; i<this._zoneSize; i++) {
+                    this._checkZone(this._zoneList[i], pNewFinger);
+                }
+            }
+        },
+
+        _onFingerUpdate: function(pFinger) {
+            for(var i=0; i<this._zoneSize; i++) {
+                this._checkZone(this._zoneList[i], pFinger);
+            }
+        },
+
+        _onFingerRemoved: function(pFinger) {
+            var zone;
+            for(var i=0; i<this._zoneSize; i++) {
+                zone = this._zoneList[i];
+                if(this._zoneMap[zone.id] === true) {
+                    this._fireLeaveZone(zone);
+                }
+            }
+
+            this._removeListenedFinger(pFinger);
+        },
+
+        /**
+         * @typedef Zone
+         * @type {Object}
+         * @property {number} id
+         * @property {number} left
+         * @property {number} right
+         * @property {number} top
+         * @property {number} bottom
+         */
+
+        /**
+         * @param {Zone} pZone
+         */
+        addZone: function(pZone) {
+            if(this._zoneList.indexOf(pZone) === -1) {
+                if(pZone.id === undefined) {
+                    pZone.id = ZoneEntering.LAST_ZONE_ID++;
+                }
+
+                this._zoneList.push(pZone);
+                this._zoneMap[pZone.id] = false;
+                this._zoneSize++;
+            }
+
+            return this;
+        },
+
+        /**
+         * @param {Zone} pZone
+         */
+        removeZone: function(pZone) {
+            var index = this._zoneList.indexOf(pZone);
+            if(index !== -1) {
+                this._zoneList.splice(index, 1);
+                delete this._zoneMap[pZone.id];
+                this._zoneSize--;
+            }
+
+            return this;
+        },
+
+        _checkZone: function(pZone, pFinger) {
+            if(this._zoneMap[pZone.id] === false && this._isInZone(pZone, pFinger.getX(), pFinger.getY())) {
+                this._zoneMap[pZone.id] = true;
+                this._fireEnterZone(pZone);
+            }
+            else if(this._zoneMap[pZone.id] === true && !this._isInZone(pZone, pFinger.getX(), pFinger.getY())) {
+                this._zoneMap[pZone.id] = false;
+                this._fireLeaveZone(pZone);
+            }
+        },
+
+        _fireEnterZone: function(pZone) {
+            this.fire(_super.EVENT_TYPE.instant, {
+                type: ZoneEntering.TYPE.enter,
+                zone: pZone
+            });
+        },
+
+        _fireLeaveZone: function(pZone) {
+            this.fire(_super.EVENT_TYPE.instant, {
+                type: ZoneEntering.TYPE.leave,
+                zone: pZone
+            });
+        },
+
+        _isInZone: function(pZone, pX, pY) {
+            return (pX >= pZone.left &&
+                pX <= pZone.right &&
+                pY >= pZone.top &&
+                pY <= pZone.bottom);
+        }
+    });
+
+    return ZoneEntering;
+})(Fingers.Gesture);
+
+Fingers.gesture.ZoneEntering = ZoneEntering;
 
 /**
  * @module fingers

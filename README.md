@@ -7,7 +7,7 @@ It also detects __multiple gestures on different objects in the same time__.
 
 
 ## Features
-- Light library (less than 3kb minified and gzipped)
+- Light library (less than 4kb minified and gzipped)
 - Work with mouse devices (1 finger) and touch devices (multiple fingers)
 - Detect action gestures (Tap, MultipleTap, Hold, Swipe, Pinch) with as many number as you want
 - Detect movement gestures (Drag, Rotate, Scale)

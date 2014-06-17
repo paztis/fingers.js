@@ -36,6 +36,7 @@ module.exports = function(grunt) {
                     'src/gestures/Swipe.js',
                     'src/gestures/Tap.js',
                     'src/gestures/Transform.js',
+                    'src/gestures/ZoneEntering.js',
                     'src/export.js',
                     'src/fingers.suffix'],
                 dest: 'fingers.js'
