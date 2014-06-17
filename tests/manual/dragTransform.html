@@ -57,10 +57,6 @@
                     topZIndex++;
                     pBoxO.zIndex = topZIndex;
                     pBoxO.isUpdated = true;
-
-                    setTimeout(function() {
-                        alert("toto");
-                    }, 1000);
                 }
             });
             finger.addGesture(Fingers.gesture.Transform, null).addHandler(function(pEventType, pData, pFingers) {
