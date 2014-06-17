@@ -1,31 +1,31 @@
 /**
  * @module gestures
  *
- * @class ZoneEntering
+ * @class ZoneHover
  * @constructor
  * @param {Object} pOptions
- * @return {ZoneEntering}
+ * @return {ZoneHover}
  */
 
 
-var ZoneEntering = (function (_super) {
+var ZoneHover = (function (_super) {
 
     var DEFAULT_OPTIONS = {
     };
 
-    function ZoneEntering(pOptions) {
+    function ZoneHover(pOptions) {
         _super.call(this, pOptions, DEFAULT_OPTIONS);
         this._zoneList = [];
         this._zoneMap = {};
     }
 
-    ZoneEntering.TYPE = {
+    ZoneHover.TYPE = {
         enter: "enter",
         leave: "leave"
     };
-    ZoneEntering.LAST_ZONE_ID = 0;
+    ZoneHover.LAST_ZONE_ID = 0;
 
-    Fingers.__extend(ZoneEntering.prototype, _super.prototype, {
+    Fingers.__extend(ZoneHover.prototype, _super.prototype, {
 
         _zoneList: null,
         _zoneMap: null,
@@ -75,7 +75,7 @@ var ZoneEntering = (function (_super) {
         addZone: function(pZone) {
             if(this._zoneList.indexOf(pZone) === -1) {
                 if(pZone.id === undefined) {
-                    pZone.id = ZoneEntering.LAST_ZONE_ID++;
+                    pZone.id = ZoneHover.LAST_ZONE_ID++;
                 }
 
                 this._zoneList.push(pZone);
@@ -100,6 +100,19 @@ var ZoneEntering = (function (_super) {
             return this;
         },
 
+        getHoveredZones: function() {
+            var enteredZones = [];
+            var zone;
+            for(var i=0; i<this._zoneSize; i++) {
+                zone = this._zoneList[i];
+                if(this._zoneMap[zone.id] === true) {
+                    enteredZones.push(zone);
+                }
+            }
+
+            return enteredZones;
+        },
+
         _checkZone: function(pZone, pFinger) {
             var isInZone = this._isInZone(pZone, pFinger.getX(), pFinger.getY());
             if(this._zoneMap[pZone.id] === false && isInZone) {
@@ -114,14 +127,14 @@ var ZoneEntering = (function (_super) {
 
         _fireEnterZone: function(pZone) {
             this.fire(_super.EVENT_TYPE.instant, {
-                type: ZoneEntering.TYPE.enter,
+                type: ZoneHover.TYPE.enter,
                 zone: pZone
             });
         },
 
         _fireLeaveZone: function(pZone) {
             this.fire(_super.EVENT_TYPE.instant, {
-                type: ZoneEntering.TYPE.leave,
+                type: ZoneHover.TYPE.leave,
                 zone: pZone
             });
         },
@@ -134,7 +147,7 @@ var ZoneEntering = (function (_super) {
         }
     });
 
-    return ZoneEntering;
+    return ZoneHover;
 })(Fingers.Gesture);
 
-Fingers.gesture.ZoneEntering = ZoneEntering;
+Fingers.gesture.ZoneHover = ZoneHover;
