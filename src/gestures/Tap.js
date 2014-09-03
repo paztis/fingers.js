@@ -13,6 +13,7 @@ var Tap = (function (_super) {
 
     var DEFAULT_OPTIONS = {
         nbFingers: 1,
+        nbTapMin: 0,
         nbTapMax: Number.MAX_VALUE,
         tapInterval: 400,
         maxDistanceMoving: Number.MAX_VALUE
@@ -33,8 +34,7 @@ var Tap = (function (_super) {
         _onFingerAdded: function(pNewFinger, pFingerList) {
             if(!this.isListening && pFingerList.length >= this.options.nbFingers) {
 
-                if((pNewFinger.getTime() - this.data.lastTapTimestamp) > this.options.tapInterval ||
-                    this.data.nbTap == this.options.nbTapMax) {
+                if((pNewFinger.getTime() - this.data.lastTapTimestamp) > this.options.tapInterval) {
                     this._clearTap();
                 }
 
@@ -55,7 +55,9 @@ var Tap = (function (_super) {
                 this.data.lastTapTimestamp = pFinger.getTime();
                 this.data.nbTap++;
 
-                this.fire(_super.EVENT_TYPE.instant, this.data);
+                if(this.data.nbTap >= this.options.nbTapMin && this.data.nbTap <= this.options.nbTapMax) {
+                    this.fire(_super.EVENT_TYPE.instant, this.data);
+                }
             }
         },
 
