@@ -1,9 +1,11 @@
 {
     "name": "fingers.js",
     "title": "Fingers.js",
+    "main": "fingers.js",
+    "types": "fingers.d.ts",
     "description": "A javascript library for synchronous touch gestures",
     "homepage": "https://github.com/paztis/fingers.js",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "author": {
         "name": "Jérôme HENAFF",
         "email": "jerome.henaff@gmail.com"
