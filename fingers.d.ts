@@ -67,13 +67,13 @@ declare namespace Fingers {
         );
         
         protected isListening: boolean;
-        protected fire<T>(event: keyof Gesture['EVENT_TYPE'], data: T);
+        protected fire<T>(event: keyof Gesture['EVENT_TYPE'], data: T): void;
 
-        protected _addListenedFinger(pNewFinger): void;
+        protected _addListenedFinger(pNewFinger: Finger): void;
 
-        protected _onFingerAdded(pNewFinger, pFingerList): void;
-        protected _onFingerUpdate(pFinger): void;
-        protected _onFingerRemoved(pFinger): void;
+        protected _onFingerAdded(pNewFinger: Finger, pFingerList: Finger[]): void;
+        protected _onFingerUpdate(pFinger: Finger): void;
+        protected _onFingerRemoved(pFinger: Finger): void;
 
         public addHandler<T>(
             handler: (
