@@ -35,7 +35,7 @@ declare namespace Fingers {
         public getTotalTime(): number;
         public getInactivityTime(): number;
 
-        /*---- time ----*/
+        /*---- position ----*/
         public getX(): number;
         public getY(): number;
 
